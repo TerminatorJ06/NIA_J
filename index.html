@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B.Arch. Curriculum & Technology Planner (5-Year) - Nitte University</title>
+    <title>B.Arch. Curriculum & Technology Planner (5-Year) - Nitte University (Google Drive Sync)</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> <!-- Optional: for icons -->
 
+    <!-- Google Identity Services and Google API Client Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+
+
     <style>
-        /* --- Start of Refined CSS v6 --- */
+        /* --- Start of Refined CSS v6 (with Google Drive Additions) --- */
         :root {
             --primary-color: #0077b6; /* Slightly softer blue */
             --primary-dark: #023e8a;
@@ -36,6 +41,10 @@
              --summary-bg: #eef2f7; /* Match header background */
              --summary-header-bg: var(--primary-color);
              --summary-header-text: white;
+
+             /* Google Drive Button Style */
+             --google-blue: #4285F4;
+             --google-blue-dark: #357ae8;
         }
 
         body {
@@ -98,7 +107,7 @@
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
              line-height: 1.5; /* Slightly more open line height */
              white-space: pre-wrap; /* Ensure line breaks are respected */
-             text-align: left; /* <-- Changed from center */
+             text-align: left; /* Changed from center */
         }
         .semester-summary[contenteditable="true"] {
             background-color: var(--editable-bg);
@@ -131,12 +140,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow */
              /* min-width defined within specific table-responsive styles */
-             /* Removed min-width from generic .table-responsive */
         }
 
          /* Specific min-width for curriculum tables */
         .semester-section .table-responsive {
-             min-width: 1700px; /* <-- Increased min-width to make table wider */
+             min-width: 1700px; /* Increased min-width to make table wider */
         }
 
          /* Scrollbar styling */
@@ -158,11 +166,8 @@
 
         /* Planner Table Styles */
         table {
-            /* width: 100%; /* Already set on .table-responsive table */
             border-collapse: collapse;
-            /* min-width: 1700px; /* Moved to .table-responsive */
             font-size: 0.9em; /* Slightly smaller table font */
-            /* table-layout: fixed; /* Already set on .table-responsive table */
         }
 
         th, td {
@@ -239,7 +244,7 @@
         td.riba-cell {
              background-color: var(--container-bg);
              padding: 8px 6px; /* Adjusted padding for select */
-             vertical-align: top; /* <-- Changed from middle */
+             vertical-align: top; /* Changed from middle */
              min-height: 35px; /* Match other editable cells */
         }
 
@@ -330,7 +335,7 @@
             font-size: 1em;
             border-radius: 6px; /* Slightly more rounded */
             cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
             margin-top: 20px; /* More space above buttons */
             margin-right: 10px;
             font-weight: 500; /* Medium weight */
@@ -345,17 +350,29 @@
              box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        #save-button {
-             background-color: var(--secondary-dark); /* Use a related blue */
-             padding: 13px 35px; /* Make save button slightly larger */
-             font-weight: 600;
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
         }
-        #save-button:hover {
-             background-color: var(--secondary-color);
+
+
+        /* Google Drive Specific Button Styles */
+        #google-drive-buttons button {
+             background-color: var(--google-blue);
         }
-         #save-button:active {
-             background-color: var(--primary-dark); /* Darken on click */
+         #google-drive-buttons button:hover {
+             background-color: var(--google-blue-dark);
          }
+          #google-drive-buttons button:active {
+             background-color: #1a5cdb; /* Slightly darker */
+          }
+
+        /* Hide buttons conditionally */
+         #sign-in-button[hidden] { display: none; }
+         #sign-out-button[hidden] { display: none; }
+         #save-to-drive-button[hidden] { display: none; }
+         #load-from-drive-button[hidden] { display: none; }
 
 
         .add-course-button-container {
@@ -366,6 +383,13 @@
              text-align: center;
              margin-top: 50px; /* More space above global action buttons */
          }
+        .google-drive-status {
+             text-align: center;
+             margin-top: 10px;
+             font-size: 0.9em;
+             color: var(--dark-grey);
+             min-height: 1.2em; /* Reserve space */
+        }
 
 
         /* Delete button specific styles */
@@ -494,6 +518,8 @@
              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
              font-size: 1em;
              font-weight: 500;
+             max-width: 80%; /* Prevent overflow on small screens */
+             text-align: center;
         }
         .save-notification.show {
             opacity: 1;
@@ -502,6 +528,16 @@
          .save-notification.error {
              background-color: #dc3545; /* Error red */
          }
+          .save-notification.info {
+             background-color: #ffc107; /* Warning yellow */
+              color: #343a40;
+         }
+         .save-notification.info.show {
+            opacity: 1; visibility: visible;
+            background-color: #ffc107; /* Warning yellow */
+            color: #343a40;
+         }
+
 
         /* Ensure textarea in notes/remarks preserves spaces */
         /* This is handled by white-space: pre-wrap and innerHTML/value */
@@ -514,7 +550,17 @@
 <div class="curriculum-planner">
     <h1>B.Arch. Curriculum Planner 2025</h1>
     <h2>Nitte Institute of Architecture - Based on Batch 2020-21 Regulations</h2>
-    <p class="instructions"><em>Click on table cells or summary paragraphs to edit. Use dropdowns for Default and Direct RIBA theme connections. Credit totals update automatically. Unused RIBA themes per semester are listed below each table. Use the 'Save Planner' button to store your edits locally in your browser. Delete rows using the <span style="color: var(--delete-color); font-weight: 600;">&times;</span> button in the Actions column.</em></p>
+    <p class="instructions"><em>Click on table cells or summary paragraphs to edit. Use dropdowns for Default and Direct RIBA theme connections. Credit totals update automatically. Unused RIBA themes per semester are listed below each table. Use the Google Drive buttons below to save and load your planner data from your Google Drive. Delete rows using the <span style="color: var(--delete-color); font-weight: 600;">&times;</span> button in the Actions column.</em></p>
+
+    <!-- Google Drive Actions -->
+    <div class="action-buttons" id="google-drive-buttons">
+        <button id="sign-in-button">Sign In with Google</button>
+        <button id="sign-out-button" hidden>Sign Out</button>
+        <button id="save-to-drive-button" hidden disabled>Save to Google Drive</button>
+        <button id="load-from-drive-button" hidden disabled>Load from Google Drive</button>
+    </div>
+     <div class="google-drive-status" id="google-drive-status">Not signed in.</div>
+
 
     <!-- --- Semester Tables (Sem 1 to 10) --- -->
 
@@ -1304,7 +1350,7 @@
             <tbody>
                 <tr> <!-- 12 Cells -->
                     <td contenteditable="true" spellcheck="false">20BAR95</td>
-                    <td contenteditable="true" spellcheck="false">Internship</td>
+                    <td contenteditable="true" spellcheck="false">Co-operative Learning</td>
                     <td contenteditable="true" data-cell-type="credits" spellcheck="false">24</td>
                     <td class="riba-cell"><select class="riba-select"></select></td>
                     <td class="riba-cell"><select class="riba-select"></select></td>
@@ -1312,7 +1358,7 @@
                      <td class="riba-cell"><select class="riba-select"></select></td>
                     <td contenteditable="true" spellcheck="false"></td>
                     <td class="riba-cell"><select class="riba-select"></select></td>
-                    <td contenteditable="true" spellcheck="false">Real-world Application (Revit, Rhino, GIS, CAD, Project Management SW, Navisworks, etc.). Full semester internship.</td>
+                    <td contenteditable="true" spellcheck="false">Industry Software Exposure (Revit, CAD, etc.). Full semester internship/practical training.</td>
                     <td contenteditable="true" spellcheck="false"></td>
                     <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
                 </tr>
@@ -1467,29 +1513,509 @@
         <textarea id="general-notes-area" placeholder="Enter any overall notes about the curriculum plan, technology choices, RIBA mapping, or implementation here..." spellcheck="false"></textarea>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        <button id="save-button" onclick="saveData()">Save Planner</button>
-    </div>
-
     <!-- Save Notification -->
-    <div id="save-notification" class="save-notification" role="alert">Planner saved successfully!</div>
+    <div id="save-notification" class="save-notification" role="alert"></div>
 
 </div><!-- /.curriculum-planner -->
 
 <script>
-    /* --- Start of Refined JavaScript v7 (5yr with RIBA Summary Table) --- */
+    /* --- Start of Refined JavaScript v8 (5yr with RIBA Summary Table & Google Drive) --- */
     const ribaThemes = [
         "Health & Life Safety", "Ethics", "Professional Practice", "Structures",
         "Construction", "Resources", "History", "Theory & Methodologies",
         "Design Pedagogies", "Architectural Expression", "Business Skills",
         "Climate Literacy", "Research Literacy"
     ];
-    // Updated Key for this version
-    const localStorageKey = 'bArchCurriculumData_Nitte_V7yr_RIBA_Summary'; // Version 7 key
+     // Updated Key for this version (Google Drive requires a different approach, but keep localStorage for fallback/initial load)
+    const localStorageKey = 'bArchCurriculumData_Nitte_V8yr_RIBA_GD'; // Version 8 key for localStorage fallback
 
      // Array of semester IDs for easier looping
     const semesterIds = ['sem1', 'sem2', 'sem3', 'sem4', 'sem5', 'sem6', 'sem7', 'sem8', 'sem9', 'sem10'];
+
+    // --- Google Drive Configuration ---
+    // ** IMPORTANT: Replace with your actual Google API Client ID **
+    const GOOGLE_CLIENT_ID = '868008431522-jud5g0as0a07f2vigsj1f6j9vn4bgck9.apps.googleusercontent.com';
+    // File name to use in Google Drive
+    const PLANNER_FILE_NAME = 'BArchCurriculumPlannerData.json';
+    // Scopes required for Drive API
+    const SCOPES = 'https://www.googleapis.com/auth/drive.file'; // Grants access only to files created or opened by this app
+
+    // --- Google Drive State Variables ---
+    let tokenClient; // Google Identity Services client for getting tokens
+    let accessToken = null; // Current access token
+    let plannerFileId = null; // ID of the planner file in Google Drive
+
+    // --- UI Elements ---
+    const signInButton = document.getElementById('sign-in-button');
+    const signOutButton = document.getElementById('sign-out-button');
+    const saveToDriveButton = document.getElementById('save-to-drive-button');
+    const loadFromDriveButton = document.getElementById('load-from-drive-button');
+    const driveStatusElement = document.getElementById('google-drive-status');
+    const notificationElement = document.getElementById('save-notification'); // Use the existing notification
+
+    // --- Helper Functions ---
+    function setDriveStatus(message, type = 'info') {
+        driveStatusElement.textContent = message;
+         driveStatusElement.style.color = type === 'error' ? 'var(--delete-dark)' : type === 'success' ? 'var(--primary-dark)' : 'var(--dark-grey)';
+    }
+
+     // Show Save/Error Notification (Reusing the existing one)
+     function showNotification(message, isError = false, isInfo = false) {
+         notificationElement.textContent = message;
+         notificationElement.classList.remove('error', 'info', 'show'); // Remove previous states
+
+         if (isError) {
+             notificationElement.classList.add('error');
+         } else if (isInfo) {
+             notificationElement.classList.add('info');
+         }
+         notificationElement.classList.add('show');
+
+         // Hide after 3 seconds
+         if (notificationElement._timer) clearTimeout(notificationElement._timer);
+         notificationElement._timer = setTimeout(() => {
+             notificationElement.classList.remove('show');
+         }, 3000);
+     }
+
+
+    // --- Google Identity Services Initialization ---
+    function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: SCOPES,
+            callback: (resp) => {
+                handleClientLoad(resp);
+            },
+            prompt: '', // Request permissions explicitly when calling requestAccessToken
+        });
+         // console.log("GIS client initialized.");
+         updateSignInStatus(); // Update UI based on initial auth state (if any)
+    }
+
+    // --- Google API Client Library Initialization ---
+    function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+        // console.log("GAPI client library loaded.");
+    }
+
+    function initializeGapiClient() {
+        // Initialize the client library (no API key needed for OAuth flows)
+        gapi.client.init({})
+            .then(() => {
+                // Library is initialized, ready to make API calls
+                // console.log("GAPI client initialized.");
+                // We don't need to check auth status here, GIS handles the initial state
+                // and token management via tokenClient.requestAccessToken
+                setupButtonListeners(); // Setup listeners AFTER GAPI and GIS are ready
+                 // Attempt to load file ID from localStorage
+                 plannerFileId = localStorage.getItem(`${localStorageKey}_fileId`);
+                 // console.log("Loaded plannerFileId from localStorage:", plannerFileId);
+                 updateSignInStatus(); // Update button states after init and loading file ID
+            })
+            .catch((error) => {
+                console.error("Error initializing GAPI client:", error);
+                 setDriveStatus("Error initializing Google Drive.", 'error');
+                 showNotification("Could not initialize Google Drive integration.", true);
+            });
+    }
+
+    // --- Handle Google Sign-in/Sign-out ---
+     function handleAuthClick() {
+         if (tokenClient) {
+              tokenClient.requestAccessToken(); // Request token - this triggers the sign-in/auth flow if needed
+         } else {
+             console.error("Token client not initialized.");
+              setDriveStatus("Google Sign-in not ready.", 'error');
+              showNotification("Google Sign-in is not ready. Please refresh.", true);
+         }
+     }
+
+     function handleClientLoad(resp) {
+        // This is called after tokenClient.requestAccessToken() completes
+        if (resp.error) {
+            // Handle authorization errors (user denied access, etc.)
+            console.error('Authorization error:', resp.error);
+             if (resp.error === 'popup_closed_by_user') {
+                  setDriveStatus("Sign-in popup closed.", 'info');
+                  // No notification needed for user action
+             } else if (resp.error === 'access_denied') {
+                 setDriveStatus("Access to Google Drive denied.", 'error');
+                  showNotification("Access to Google Drive denied. Cannot save/load.", true);
+             } else {
+                 setDriveStatus(`Sign-in error: ${resp.error}`, 'error');
+                 showNotification(`Google Sign-in failed: ${resp.error_description || resp.error}`, true);
+             }
+
+            accessToken = null;
+            updateSignInStatus(); // Ensure buttons are disabled
+            return;
+        }
+
+        // Authorization successful
+        accessToken = resp.access_token;
+        gapi.client.setToken({ access_token: accessToken }); // Set the token for gapi.client
+        // console.log("Signed in. Access Token:", accessToken);
+        setDriveStatus("Signed in to Google Drive.", 'success');
+        updateSignInStatus(); // Enable buttons
+
+         // Now that we are signed in and have an access token,
+         // we might want to immediately try loading data if the user hasn't already
+         // (or just rely on them clicking the load button).
+         // Let's rely on the Load button for explicit loading after sign-in.
+
+         // However, if the fileId was *not* loaded from localStorage,
+         // we should proactively search for it *after* signing in.
+         if (!plannerFileId) {
+             findOrCreatePlannerFile().then(() => {
+                  // File found or created, ID is now set.
+                  // Optional: could load data automatically here if desired,
+                  // but explicit Load button is safer.
+                  // console.log("Finished finding/creating file after sign-in.");
+             }).catch(err => {
+                  console.error("Error finding/creating file after sign-in:", err);
+                  setDriveStatus("Error finding planner file.", 'error');
+                  showNotification("Error finding your planner file in Drive.", true);
+             });
+         }
+     }
+
+
+    function handleSignoutClick() {
+        if (accessToken) {
+             // Google Identity Services doesn't have a synchronous 'signOut' like gapi.auth2
+             // Setting the token to null effectively signs out the current session for gapi.client
+             gapi.client.setToken(null);
+             accessToken = null;
+             plannerFileId = null; // Also clear the file ID as it's tied to the user/account
+             localStorage.removeItem(`${localStorageKey}_fileId`); // Remove file ID from local storage
+
+             // You can also revoke the token if you want to invalidate it immediately
+             // This is usually not necessary for a simple app, signing out by clearing the token is sufficient.
+             // google.accounts.oauth2.revoke(gapi.client.getToken().access_token, () => { console.log('Token revoked.'); });
+
+             setDriveStatus("Signed out.", 'info');
+             // console.log("Signed out.");
+             updateSignInStatus(); // Disable buttons
+             showNotification("Signed out of Google Drive.", true, true); // Info notification
+        }
+    }
+
+    // --- UI Update Functions ---
+    function updateSignInStatus() {
+        const signedIn = !!accessToken;
+        signInButton.hidden = signedIn;
+        signOutButton.hidden = !signedIn;
+
+        // Enable Save/Load buttons only when signed in AND GAPI is initialized
+        const gapiReady = !!gapi?.client?.drive;
+        saveToDriveButton.disabled = !signedIn || !gapiReady;
+        loadFromDriveButton.disabled = !signedIn || !gapiReady;
+        saveToDriveButton.hidden = !signedIn;
+        loadFromDriveButton.hidden = !signedIn;
+
+        if (!signedIn) {
+            setDriveStatus("Not signed in.");
+        } else if (!gapiReady) {
+             setDriveStatus("Signing in... initializing Drive API.");
+        } else if (!plannerFileId) {
+             setDriveStatus("Signed in. Searching for planner file...");
+        } else {
+            // Status is already set to "Signed in..." on successful auth callback
+             setDriveStatus("Signed in. Planner file found/ready.", 'success');
+        }
+
+    }
+
+     // --- Google Drive File Management Functions ---
+
+    /**
+     * Searches for the planner file by name. If not found, creates it.
+     * Stores the file ID in plannerFileId and localStorage.
+     * Returns a Promise that resolves with the file ID.
+     */
+    async function findOrCreatePlannerFile() {
+        if (plannerFileId) {
+            // console.log("File ID already known:", plannerFileId);
+            return plannerFileId; // Use cached ID
+        }
+
+        if (!accessToken) {
+            throw new Error("Not signed in to Google Drive.");
+        }
+        if (!gapi?.client?.drive) {
+            throw new Error("Google Drive API client not initialized.");
+        }
+
+        setDriveStatus(`Searching for "${PLANNER_FILE_NAME}"...`, 'info');
+
+        try {
+            // Search for the file by name and MIME type
+            const response = await gapi.client.drive.files.list({
+                q: `name='${PLANNER_FILE_NAME}' and mimeType='application/json' and trashed=false`,
+                fields: 'files(id, name)',
+                spaces: 'drive',
+                pageSize: 1 // We only expect one such file
+            });
+
+            const files = response.result.files;
+
+            if (files && files.length > 0) {
+                // File found
+                plannerFileId = files[0].id;
+                localStorage.setItem(`${localStorageKey}_fileId`, plannerFileId);
+                setDriveStatus(`Found planner file: "${files[0].name}".`, 'success');
+                // console.log("Found existing planner file:", plannerFileId);
+                return plannerFileId;
+            } else {
+                // File not found, create it
+                setDriveStatus(`"${PLANNER_FILE_NAME}" not found. Creating new file...`, 'info');
+                const createResponse = await gapi.client.drive.files.create({
+                    resource: {
+                        name: PLANNER_FILE_NAME,
+                        mimeType: 'application/json'
+                         // Adding appProperties helps in finding the file later
+                         // appProperties: { 'plannerVersion': 'V8' }
+                    },
+                    fields: 'id, name',
+                });
+
+                plannerFileId = createResponse.result.id;
+                localStorage.setItem(`${localStorageKey}_fileId`, plannerFileId);
+                setDriveStatus(`Created new planner file: "${createResponse.result.name}".`, 'success');
+                // console.log("Created new planner file:", plannerFileId);
+                return plannerFileId;
+            }
+        } catch (error) {
+            console.error("Error finding or creating file:", error);
+            const errorMessage = error.result?.error?.message || error.body?.error?.message || error.message || "Unknown error";
+             setDriveStatus(`Error finding/creating file: ${errorMessage}`, 'error');
+            throw new Error(`Could not find or create planner file: ${errorMessage}`); // Propagate error
+        } finally {
+             updateSignInStatus(); // Ensure buttons are updated based on file ID presence
+        }
+    }
+
+     /**
+      * Saves the current planner data to the file in Google Drive.
+      */
+    async function saveDataToDrive() {
+        if (!accessToken) {
+            showNotification("Please sign in to Google Drive first.", true, true); // Info, not error
+            handleAuthClick(); // Prompt sign-in
+            return; // Stop execution until signed in
+        }
+
+         showNotification("Saving to Google Drive...", false, true); // Info notification
+         setDriveStatus("Saving...", 'info');
+
+        try {
+            const fileId = await findOrCreatePlannerFile(); // Ensure file exists and ID is known
+
+            const data = collectPlannerData(); // Collect data from the page
+            const jsonContent = JSON.stringify(data, null, 2); // Stringify with formatting
+
+            // Update the file content using the 'upload' endpoint with PATCH
+            // https://developers.google.com/drive/api/guides/manage-uploads
+            const boundary = '-------314159265358979323846';
+            const delimiter = "\r\n--" + boundary + "\r\n";
+            const closeDelimiter = "\r\n--" + boundary + "--";
+
+            const metadata = {
+                 'mimeType': 'application/json'
+            };
+
+            let multipartRequestBody =
+                delimiter +
+                'Content-Type: application/json\r\n\r\n' +
+                JSON.stringify(metadata) +
+                delimiter +
+                'Content-Type: application/json\r\n\r\n' +
+                jsonContent +
+                closeDelimiter;
+
+            const response = await gapi.client.request({
+                path: '/upload/drive/v3/files/' + fileId,
+                method: 'PATCH',
+                params: {
+                    uploadType: 'multipart' // Indicate multipart upload
+                },
+                headers: {
+                    'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                },
+                body: multipartRequestBody
+            });
+
+            // console.log("Save successful:", response);
+            showNotification("Planner saved to Google Drive!", false); // Success notification
+            setDriveStatus("Saved successfully.", 'success');
+
+        } catch (error) {
+            console.error("Error saving to Google Drive:", error);
+             const errorMessage = error.result?.error?.message || error.body?.error?.message || error.message || "Unknown error";
+             showNotification(`Error saving to Drive: ${errorMessage}`, true); // Error notification
+            setDriveStatus(`Save failed: ${errorMessage}`, 'error');
+             // If the error is authentication related, prompt sign-in
+             if (error.status === 401) { // Unauthorized
+                  setDriveStatus("Authentication expired. Please sign in again.", 'info');
+                  // Maybe clear token and prompt sign-in? Or let the user click the button.
+                  // Clearing token and prompting might be aggressive. Let the user click sign in.
+             }
+        } finally {
+             updateSignInStatus(); // Ensure buttons are correctly enabled/disabled
+        }
+    }
+
+     /**
+      * Loads planner data from the file in Google Drive.
+      */
+    async function loadDataFromDrive() {
+        if (!accessToken) {
+            showNotification("Please sign in to Google Drive first.", true, true); // Info, not error
+            handleAuthClick(); // Prompt sign-in
+            return; // Stop execution until signed in
+        }
+
+         showNotification("Loading from Google Drive...", false, true); // Info notification
+         setDriveStatus("Loading...", 'info');
+
+        try {
+            const fileId = await findOrCreatePlannerFile(); // Ensure file exists and ID is known
+
+            // Get file content using alt=media parameter
+            const response = await gapi.client.drive.files.get({
+                fileId: fileId,
+                alt: 'media' // Specify that we want the file content
+            });
+
+            const loadedData = response.result; // The response.result directly contains the JSON parsed object
+            // console.log("Load successful:", loadedData);
+
+            // Apply the loaded data to the page
+            applyPlannerData(loadedData);
+
+             showNotification("Planner loaded from Google Drive!", false); // Success notification
+             setDriveStatus("Loaded successfully.", 'success');
+
+        } catch (error) {
+            console.error("Error loading from Google Drive:", error);
+             const errorMessage = error.result?.error?.message || error.body?.error?.message || error.message || "Unknown error";
+             showNotification(`Error loading from Drive: ${errorMessage}`, true); // Error notification
+            setDriveStatus(`Load failed: ${errorMessage}`, 'error');
+             // If the error is authentication related, prompt sign-in
+              if (error.status === 401) { // Unauthorized
+                  setDriveStatus("Authentication expired. Please sign in again.", 'info');
+             }
+        } finally {
+             updateSignInStatus(); // Ensure buttons are correctly enabled/disabled
+        }
+    }
+
+
+     // --- Data Collection and Application Functions ---
+
+     // Collects all data from the HTML planner into a JSON object
+     function collectPlannerData() {
+        const data = {
+            semesters: {},
+            summaries: {},
+            generalNotes: document.getElementById('general-notes-area').value.trim() // Use .value for textarea
+        };
+
+        semesterIds.forEach(semId => {
+            const tableId = `${semId}-table`;
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.querySelectorAll('tr:not(.total-credits-row)'); // Select rows that are not the total row
+            const semesterData = [];
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                 if (cells.length < 12) { // Ensure we have enough cells
+                      console.warn(`Skipping row in ${tableId} due to unexpected number of cells (${cells.length})`, row);
+                      return;
+                 }
+                // Capture data from the first 11 cells (indices 0-10)
+                const course = {
+                    code: cells[0].textContent.trim(), // Text field
+                    title: cells[1].textContent.trim(), // Text field
+                    credits: cells[2].textContent.trim(), // Text field (will be parsed to int on load)
+                    defaultRibaTheme: cells[3].querySelector('select.riba-select')?.value || "", // Select value
+                    acadRibaDirect: cells[4].querySelector('select.riba-select')?.value || "", // Select value
+                    academicNotes: cells[5].innerHTML.trim(), // innerHTML for multi-line notes
+                    ethicsRibaDirect: cells[6].querySelector('select.riba-select')?.value || "", // Select value
+                    ethicsNotes: cells[7].innerHTML.trim(), // innerHTML for multi-line notes
+                    techRibaDirect: cells[8].querySelector('select.riba-select')?.value || "",  // Select value
+                    techNotes: cells[9].innerHTML.trim(), // innerHTML for multi-line notes
+                    remarks: cells[10].innerHTML.trim() // innerHTML for multi-line remarks
+                };
+                semesterData.push(course);
+            });
+            data.semesters[semId] = semesterData;
+
+            // Save Summary Data
+            const summaryElement = document.getElementById(`${semId}-summary`);
+            if (summaryElement) {
+                data.summaries[semId] = summaryElement.innerHTML.trim(); // Use innerHTML for summary
+            }
+        });
+        return data;
+     }
+
+     // Applies loaded data to the HTML planner
+     function applyPlannerData(data) {
+        if (!data) {
+            console.warn("No data provided to apply.");
+            return;
+        }
+
+        // Apply general notes
+        const generalNotesArea = document.getElementById('general-notes-area');
+        if (generalNotesArea && data.generalNotes !== undefined) {
+            generalNotesArea.value = data.generalNotes;
+        }
+
+        // Apply semester data
+        semesterIds.forEach(semId => {
+            const tableId = `${semId}-table`;
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const tbody = table.getElementsByTagName('tbody')[0];
+             // Clear existing data rows (keep header and total row if they exist in HTML)
+             const existingRows = tbody.querySelectorAll('tr:not(.total-credits-row)');
+             existingRows.forEach(row => row.remove());
+
+            if (data.semesters && data.semesters[semId] && Array.isArray(data.semesters[semId])) {
+                 data.semesters[semId].forEach(course => {
+                     addCourseRevised(tableId, course); // Use the addCourse function to add rows from data
+                 });
+            } else {
+                // If no data for this semester in the loaded file, re-initialize defaults if any exist in HTML
+                // This is handled by initial population/loading if no Drive data is found.
+                // We don't *add* default rows here, just ensure existing ones are handled if load failed for this sem.
+                // Or if the loaded data structure is missing the semester.
+                // Let's re-populate selects and recalculate for existing (default) rows just in case.
+                 table.querySelectorAll('tbody tr:not(.total-credits-row) select.riba-select').forEach(select => {
+                      // If addCourseRevised wasn't called for this row, ensure its selects are populated
+                      // This case should ideally not happen if existing rows are cleared.
+                      // Re-running populateRibaSelect on all selects after clearing might be safer.
+                 });
+            }
+
+            // Apply Summary Data
+            const summaryElement = document.getElementById(`${semId}-summary`);
+            if (summaryElement && data.summaries && data.summaries[semId] !== undefined) {
+                 summaryElement.innerHTML = data.summaries[semId];
+            }
+        });
+
+         // Recalculate everything after applying data
+         calculateAllSemestersCredits();
+         calculateAllSemestersUnusedRiba(); // This calls calculateUnusedRiba for each sem
+         updateRibaSummaryTable(); // This rebuilds the summary table
+     }
 
 
     // --- Populate RIBA Dropdowns ---
@@ -1523,16 +2049,18 @@
         }
     }
 
-    function initializeRibaDropdowns() {
+    // Function to initialize dropdowns for *all* selects currently in the DOM
+     function initializeAllRibaDropdowns() {
         const allSelects = document.querySelectorAll('select.riba-select');
         allSelects.forEach(select => {
-            // Capture the initial value from the HTML before populating
+            // If the select already has a 'value' attribute from HTML or a previous load, use it.
+            // Otherwise, it will be the default empty string.
             const initialValue = select.getAttribute('value') || select.value;
             populateRibaSelect(select, initialValue);
              // Remove value attribute after populating to prevent issues
              select.removeAttribute('value');
         });
-    }
+     }
 
 
     // --- Calculate Semester Credits ---
@@ -1653,7 +2181,7 @@
                               themeCounts[selectedTheme].total++;
                          } else {
                              // This case should ideally not happen if ribaThemes is comprehensive
-                             console.warn(`Unexpected theme selected: ${selectedTheme}`);
+                             console.warn(`Unexpected theme selected: "${selectedTheme}"`);
                          }
                     }
                 });
@@ -1682,7 +2210,6 @@
             totalCell.style.fontWeight = 'bold'; // Make total count bold
             totalCell.style.color = 'var(--primary-dark)'; // Highlight total
             row.appendChild(totalCell);
-
 
             summaryTableBody.appendChild(row);
         });
@@ -1728,7 +2255,10 @@
                  // Use innerHTML for notes/remarks/summaries to preserve formatting, textContent for others
                  // Indices 5, 7, 9, 10 are Notes/Remarks columns
                  if (isEditable && (cellIndex === 5 || cellIndex === 7 || cellIndex === 9 || cellIndex === 10)) {
-                      cell.innerHTML = content; // Use innerHTML here for notes/remarks
+                      // Ensure content is treated as text before setting innerHTML to avoid script injection
+                      const div = document.createElement('div');
+                      div.textContent = content; // Set text content
+                      cell.innerHTML = div.innerHTML; // Get safe HTML representation (e.g., converts newlines to <br>)
                  } else if (cellIndex === 2 && isEditable) {
                      // Credits cell: ensure it's treated as text input for editing but stored as int
                      cell.textContent = content; // Allow initial content as string "0" or number
@@ -1827,7 +2357,7 @@
          if (table && table.id) {
              // Debounce the calculation slightly
              clearTimeout(cell._creditCalcTimer); // Clear any pending timer
-             cell._creditCalcTimer = setTimeout(() => calculateSemesterCredits(table.id), 150); // Calculate after 150ms
+             cell._creditCalcTimer = setTimeout(() => calculateSemesterCredits(table.id), 50); // Calculate after 50ms
          }
      }
 
@@ -1877,235 +2407,122 @@
      }
 
 
-    // --- Save Data Functionality ---
-    function saveData() {
-        const data = {
-            semesters: {},
-            summaries: {},
-            generalNotes: document.getElementById('general-notes-area').value.trim() // Use .value for textarea
-        };
-
-        semesterIds.forEach(semId => {
-            const tableId = `${semId}-table`;
-            const table = document.getElementById(tableId);
-            if (!table) return;
-
-            const tbody = table.getElementsByTagName('tbody')[0];
-            // Select rows that are not the total row
-            const rows = tbody.querySelectorAll('tr:not(.total-credits-row)');
-            const semesterData = [];
-            rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                // We expect 12 cells (11 data + 1 delete button)
-                if (cells.length < 12) {
-                     console.warn(`Skipping row in ${tableId} with unexpected number of cells (${cells.length}):`, row);
-                     return;
-                }
-
-                // Capture data from the first 11 cells (indices 0-10)
-                const course = {
-                    code: cells[0].textContent.trim(), // Text field
-                    title: cells[1].textContent.trim(), // Text field
-                    credits: cells[2].textContent.trim(), // Text field (will be parsed to int on load)
-                    defaultRibaTheme: cells[3].querySelector('select.riba-select')?.value || "", // Select value
-                    acadRibaDirect: cells[4].querySelector('select.riba-select')?.value || "", // Select value
-                    academicNotes: cells[5].innerHTML.trim(), // innerHTML for multi-line notes
-                    ethicsRibaDirect: cells[6].querySelector('select.riba-select')?.value || "", // Select value
-                    ethicsNotes: cells[7].innerHTML.trim(), // innerHTML for multi-line notes
-                    techRibaDirect: cells[8].querySelector('select.riba-select')?.value || "",  // Select value
-                    techNotes: cells[9].innerHTML.trim(), // innerHTML for multi-line notes
-                    remarks: cells[10].innerHTML.trim() // innerHTML for multi-line remarks
-                };
-                semesterData.push(course);
-            });
-            data.semesters[semId] = semesterData;
-
-            // Save Summary Data
-            const summaryElement = document.getElementById(`${semId}-summary`);
-            if (summaryElement) {
-                data.summaries[semId] = summaryElement.innerHTML.trim(); // Use innerHTML for summary
-            }
-        });
-
-        try {
-            localStorage.setItem(localStorageKey, JSON.stringify(data));
-            showSaveNotification("Planner saved successfully!");
-            // console.log("Data saved:", data);
-        } catch (error) {
-            console.error("Error saving data to localStorage:", error);
-            // Check if error is quota exceeded
-            if (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                 showSaveNotification("Error saving data: Storage is full. Clear space or reduce content.", true);
-            } else {
-                 showSaveNotification("Error saving data: " + error.message, true);
-            }
-        }
-    }
-
-     // --- Show Save Notification ---
-     function showSaveNotification(message, isError = false) {
-         const notification = document.getElementById('save-notification');
-         if (!notification) return;
-
-         notification.textContent = message;
-         notification.classList.toggle('error', isError); // Add/remove error class
-
-         // Force reflow to restart animation if already visible
-         notification.classList.remove('show');
-         void notification.offsetWidth; // Trigger reflow
-         notification.classList.add('show');
-
-         // Hide after 3 seconds
-         if (notification._timer) clearTimeout(notification._timer);
-         notification._timer = setTimeout(() => {
-             notification.classList.remove('show');
-         }, 3000);
-     }
-
-
-    // --- Load Data Functionality ---
-    function loadData() {
+    // --- Initial Load (Try localStorage first) ---
+    function initialLoad() {
         const savedDataString = localStorage.getItem(localStorageKey);
-        let dataLoadedSuccessfully = false;
+        let dataLoaded = false;
+
         if (savedDataString) {
              try {
                 const savedData = JSON.parse(savedDataString);
-                document.getElementById('general-notes-area').value = savedData.generalNotes || "";
-
-                let semesterDataFound = false;
-                 semesterIds.forEach(semId => {
-                    const tableId = `${semId}-table`;
-                    const table = document.getElementById(tableId);
-
-                    if (table) {
-                         const tbody = table.getElementsByTagName('tbody')[0];
-                         // Remove all existing data rows (keep header and total row if they exist in HTML)
-                         const existingRows = tbody.querySelectorAll('tr:not(.total-credits-row)');
-                         existingRows.forEach(row => row.remove());
-
-                         if (savedData.semesters && savedData.semesters[semId] && savedData.semesters[semId].length > 0) {
-                             savedData.semesters[semId].forEach(course => {
-                                 addCourseRevised(tableId, course); // addCourseRevised calculates credits and unused RIBA and updates summary
-                             });
-                             semesterDataFound = true;
-                         } else {
-                              // If no saved data for this table, ensure default HTML rows are present
-                              // (This is handled by the static HTML structure) and initialize their selects.
-                              // Need to initialize selects on the *default* rows that weren't removed
-                              table.querySelectorAll('tbody tr:not(.total-credits-row) select.riba-select').forEach(select => {
-                                  populateRibaSelect(select, select.getAttribute('value') || select.value); // Use value from HTML
-                                   select.removeAttribute('value'); // Clean up attribute
-                              });
-                             // Also calculate unused RIBA for this potentially empty or default table
-                             calculateUnusedRiba(tableId);
-                              // And update the summary table based on current (default/empty) data
-                              updateRibaSummaryTable(); // Call here if semester wasn't populated from saved data
-                         }
-
-                         // Load Summary Data
-                         const summaryElement = document.getElementById(`${semId}-summary`);
-                         if (summaryElement && savedData.summaries && savedData.summaries[semId] !== undefined) {
-                             summaryElement.innerHTML = savedData.summaries[semId]; // Use innerHTML for summary
-                         }
-                    }
-                });
-
-                // console.log("Data load attempt finished.");
-                // Consider load successful if JSON parsed AND there was semester data or summary/general notes
-                if (semesterDataFound || (savedData.generalNotes !== undefined && savedData.generalNotes !== "") || (savedData.summaries && Object.keys(savedData.summaries).length > 0)) {
-                    dataLoadedSuccessfully = true;
-                } else {
-                    // console.log("No significant saved data found, using default HTML or empty tables.");
+                if (savedData) {
+                    applyPlannerData(savedData);
+                    dataLoaded = true;
+                    // console.log("Data loaded from localStorage.");
+                     showNotification("Loaded data from your browser.", false, true); // Info notification
                 }
-
-
             } catch (error) {
                 console.error("Error parsing data from localStorage:", error);
-                if (savedDataString) { // Only show error if there was saved data
-                     showSaveNotification("Error loading saved data. It might be corrupted. Using default planner.", true);
-                }
+                 localStorage.removeItem(localStorageKey); // Clear potentially corrupted data
+                 showNotification("Error loading data from browser storage. It might be corrupted. Loading default plan.", true);
             }
         }
 
-        if (!dataLoadedSuccessfully) {
-             // console.log("No valid saved data found. Ensuring default view is correctly initialized and calculating initial unused RIBA.");
-             // Ensure all default dropdowns are populated if no data loaded successfully
-             initializeRibaDropdowns(); // This should handle the default rows present in the HTML
-             calculateAllSemestersUnusedRiba(); // Calculate for all semesters if no data loaded
-             updateRibaSummaryTable(); // Update the summary table based on default data
+        if (!dataLoaded) {
+            // If no data loaded from localStorage, ensure default HTML is correctly initialized
+            // This happens naturally because the HTML contains the initial structure.
+            // We just need to ensure dropdowns are populated and calculations run for the default state.
+             // console.log("No data in localStorage or data corrupted. Using default HTML structure.");
+             initializeAllRibaDropdowns(); // Populate dropdowns for default HTML rows
+             calculateAllSemestersCredits(); // Calculate credits for default data
+             calculateAllSemestersUnusedRiba(); // Calculate unused RIBA for default data
+             updateRibaSummaryTable(); // Build summary table for default data
+             setDriveStatus("Load data from Google Drive if available.", 'info'); // Prompt user for Drive load
         }
 
-        // Always calculate credits after loading or initializing
-        calculateAllSemestersCredits();
-        // Unused RIBA calculation and Summary table update are handled within loadData/addCourseRevised/handleDeleteRow/handleRibaSelectChange now.
+         // After initial load (either from local or default), check if file ID exists for Drive
+         plannerFileId = localStorage.getItem(`${localStorageKey}_fileId`);
+         // Initial update of UI buttons (they might be disabled until gapi/gis finish loading)
+         updateSignInStatus();
     }
 
-    // --- Initial Setup & Event Delegation ---
-    document.addEventListener('DOMContentLoaded', () => {
-        loadData(); // Load data, which also initializes dropdowns and calculates initial values
 
-        // Add event delegation for interactive elements within the planner
-        const plannerDiv = document.querySelector('.curriculum-planner');
-        if(plannerDiv) {
-            // Use event delegation on the main planner div
-            plannerDiv.addEventListener('click', function(event) {
-                // Delete button clicks
-                if (event.target.classList.contains('delete-row-button') || event.target.parentElement.classList.contains('delete-row-button')) {
-                     // Ensure we get the button element even if the icon inside is clicked
-                    const button = event.target.closest('.delete-row-button');
-                    if(button) handleDeleteRow({ target: button }); // Pass the button as target
-                }
-            });
+    // --- Setup Event Listeners ---
+    function setupButtonListeners() {
+        // Attach listeners for Google Drive buttons
+        signInButton.addEventListener('click', handleAuthClick);
+        signOutButton.addEventListener('click', handleSignoutClick);
+        saveToDriveButton.addEventListener('click', saveDataToDrive);
+        loadFromDriveButton.addEventListener('click', loadDataFromDrive);
 
-            // Add event delegation for input changes (specifically credits and other editable cells)
-             plannerDiv.addEventListener('input', function(event) {
-                 const target = event.target;
-                 // Check if the input is in a credit cell using the data attribute
-                 if (target.tagName === 'TD' && target.isContentEditable && target.getAttribute('data-cell-type') === 'credits')
-                 {
-                      handleCreditInput(event); // This function handles calculation and sanitation
-                 }
-                  else if (target.isContentEditable || target.tagName === 'TEXTAREA') {
-                     // Input in other editable cells or textarea
-                     // Optional: Debounce auto-save for other editable areas
-                     // debounceSave(); // Uncomment if you add debounceSave
+         // Use event delegation on the main planner div for table interactions
+         const plannerDiv = document.querySelector('.curriculum-planner');
+         if(plannerDiv) {
+             // Delete button clicks
+             plannerDiv.addEventListener('click', function(event) {
+                 const button = event.target.closest('.delete-row-button');
+                 if(button) handleDeleteRow({ target: button }); // Pass the button as target
+             });
+
+             // Input changes (specifically credits and other editable cells)
+              plannerDiv.addEventListener('input', function(event) {
+                  const target = event.target;
+                  // Check if the input is in a credit cell using the data attribute
+                  if (target.tagName === 'TD' && target.isContentEditable && target.getAttribute('data-cell-type') === 'credits')
+                  {
+                       handleCreditInput(event); // This function handles calculation and sanitation
                   }
-             });
+                   // Add debounced save for any input in editable cells or textarea
+                   // Use innerHTML for editable TDs, value for textarea
+                  if (target.isContentEditable || target.tagName === 'TEXTAREA') {
+                      // Don't need to explicitly call calculate/update here,
+                      // as handleCreditInput and handleRibaSelectChange already do.
+                      // If you add auto-save, this is where you'd trigger a debounce.
+                  }
+              });
 
-             // Add event delegation for select changes (RIBA dropdowns)
-             plannerDiv.addEventListener('change', handleRibaSelectChange); // Call handler for RIBA select changes
+              // Select changes (RIBA dropdowns)
+              plannerDiv.addEventListener('change', handleRibaSelectChange); // Call handler for RIBA select changes
 
-              // Add input listener for summary paragraphs (delegated)
-             plannerDiv.addEventListener('input', function(event) {
-                 if (event.target.classList.contains('semester-summary')) {
-                     // console.log("Summary changed");
-                     // Trigger debounced save here?
-                 }
-             });
-        }
+               // Add input listener for summary paragraphs (delegated) - use innerHTML
+              plannerDiv.addEventListener('input', function(event) {
+                  if (event.target.classList.contains('semester-summary')) {
+                      // console.log("Summary changed");
+                      // If you add auto-save, trigger debounce here
+                  }
+              });
 
-         // Initial calculation for default rows if no data was loaded
-         // This is handled within the loadData function now.
+              // Add input listener for general notes textarea - use value
+               const generalNotesArea = document.getElementById('general-notes-area');
+               if(generalNotesArea){
+                   generalNotesArea.addEventListener('input', function(event) {
+                       // If you add auto-save, trigger debounce here
+                   });
+               }
+         }
+    }
+
+
+    // --- Entry Point: Load APIs and Initial Data ---
+    document.addEventListener('DOMContentLoaded', () => {
+         // Load GIS and GAPI client libraries (they will call gisLoaded and gapiLoaded respectively)
+         // Note: The script tags in the HTML head already start this process.
+         // We just need to define the global callback functions `gisLoaded` and `gapiLoaded`.
+
+         // Start the initial data load from localStorage immediately
+         initialLoad(); // This will also set up buttons initially
+
+         // gisLoaded and gapiLoaded (called by Google scripts) will enable buttons and initialize clients.
     });
 
-    // Expose functions globally so HTML buttons work
+    // Make addCourse globally accessible for buttons in HTML
     window.addCourse = addCourseRevised;
-    window.saveData = saveData; // Ensure saveData is also global
+    // Expose save/load functions if you want to call them from console, etc.
+    // window.saveDataToDrive = saveDataToDrive; // Renamed from original saveData
+    // window.loadDataFromDrive = loadDataFromDrive;
 
-    // Optional: Debounce utility function (can be used for auto-saving)
-    /*
-    function debounce(func, delay) {
-        let timeout;
-        return function(...args) {
-            const context = this;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), delay);
-        };
-    }
-    const debounceSave = debounce(saveData, 2000); // Auto-save after 2 seconds of inactivity
-    */
 
-    /* --- End of Refined JavaScript v7 (5yr with RIBA Summary Table) --- */
+    /* --- End of Refined JavaScript v8 --- */
 </script>
 
 </body>
