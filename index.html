@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.Arch. Curriculum & Technology Planner (5-Year) - Nitte University</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> <!-- Optional: for icons -->
+
+    <style>
+        /* --- Start of Refined CSS v6 --- */
+        :root {
+            --primary-color: #0077b6; /* Slightly softer blue */
+            --primary-dark: #023e8a;
+            --secondary-color: #48cae4; /* Complementary lighter blue */
+            --secondary-dark: #0096c7;
+            --text-color: #333;
+            --heading-color: #1a202c; /* Even darker blue-grey */
+            --background-color: #f4f7f6; /* Light grey background */
+            --container-bg: #fff;
+            --border-color: #e9ecef; /* Lighter border grey */
+            --light-grey: #f8f9fa; /* Very light grey */
+            --medium-grey: #ced4da; /* Medium grey for borders/dividers */
+            --dark-grey: #6c757d; /* Slightly darker grey for helper text */
+            --editable-bg: #fffbe6; /* Soft yellow for editable */
+            --highlight-color: #e0f7fa; /* Very light blue highlight on focus */
+            --delete-color: #e74c3c; /* Red */
+            --delete-dark: #c0392b;
+
+            /* New color for unused themes */
+            --unused-bg: #f8d7da; /* Very light red background */
+            --unused-text: #721c24; /* Darker red text */
+            --unused-border: #f5c6cb; /* Medium red border */
+
+             /* New color for summary tables */
+             --summary-bg: #eef2f7; /* Match header background */
+             --summary-header-bg: var(--primary-color);
+             --summary-header-text: white;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 25px 20px; /* More vertical padding */
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-size: 15px; /* Slightly smaller base size */
+        }
+
+        .curriculum-planner {
+            max-width: 1800px; /* Max width of the main container */
+            margin: 20px auto;
+            background-color: var(--container-bg);
+            padding: 40px 50px; /* Increased padding */
+            border-radius: 12px; /* Slightly more rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Softer, wider shadow */
+            /* Allow container to shrink below max-width if needed for smaller screens */
+             width: auto;
+        }
+
+        h1, h2 {
+             text-align: center;
+             color: var(--heading-color);
+             font-weight: 600;
+        }
+        h1 { font-size: 2.4em; margin-bottom: 10px; margin-top: 0;}
+        h2 { font-size: 1.4em; margin-bottom: 45px; font-weight: 400; color: var(--dark-grey); }
+
+        h3 { /* Semester Titles */
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 12px; /* More padding below title */
+            margin-top: 60px; /* More space above sections */
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.7em;
+        }
+         h4 { /* General Notes Title & Summary Title */
+            color: var(--heading-color);
+            margin-top: 50px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            font-weight: 500; /* Slightly less bold */
+         }
+
+        .semester-summary {
+            font-size: 0.95em;
+            font-style: italic;
+            color: var(--dark-grey);
+            margin-top: 10px;
+            margin-bottom: 35px; /* More space below summary */
+            padding: 18px 25px; /* Increased padding */
+            background-color: var(--light-grey);
+            border-left: 5px solid var(--primary-color); /* Wider border */
+            border-radius: 5px; /* Slightly more rounded */
+            min-height: 45px; /* Ensure clickable area */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+             line-height: 1.5; /* Slightly more open line height */
+             white-space: pre-wrap; /* Ensure line breaks are respected */
+             text-align: left; /* <-- Changed from center */
+        }
+        .semester-summary[contenteditable="true"] {
+            background-color: var(--editable-bg);
+            cursor: text;
+             font-style: normal; /* Remove italic when editing */
+        }
+        .semester-summary[contenteditable="true"]:focus {
+             outline: none;
+             box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.2); /* Softer, blue outline */
+             background-color: var(--container-bg);
+
+        }
+
+        p.instructions {
+            display: block;
+            text-align: center;
+            margin-bottom: 45px; /* More space below instructions */
+            color: var(--dark-grey);
+            font-size: 0.9em;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* Table Container for Responsiveness */
+        .table-responsive {
+            width: 100%; /* Take full width of parent */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            margin-bottom: 25px; /* More space below table */
+            border: 1px solid var(--border-color); /* Add light border to container */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+             /* min-width defined within specific table-responsive styles */
+             /* Removed min-width from generic .table-responsive */
+        }
+
+         /* Specific min-width for curriculum tables */
+        .semester-section .table-responsive {
+             min-width: 1700px; /* <-- Increased min-width to make table wider */
+        }
+
+         /* Scrollbar styling */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: var(--medium-grey);
+            border-radius: 10px;
+        }
+        .table-responsive::-webkit-scrollbar-track {
+            background: var(--light-grey);
+        }
+         .table-responsive table {
+             border: none; /* Remove inner table border as container has one */
+             width: 100%; /* Table fills the min-width of its container */
+             table-layout: fixed; /* Keep fixed layout for controlled columns */
+         }
+
+        /* Planner Table Styles */
+        table {
+            /* width: 100%; /* Already set on .table-responsive table */
+            border-collapse: collapse;
+            /* min-width: 1700px; /* Moved to .table-responsive */
+            font-size: 0.9em; /* Slightly smaller table font */
+            /* table-layout: fixed; /* Already set on .table-responsive table */
+        }
+
+        th, td {
+            border: 1px solid var(--border-color); /* Lighter inner borders */
+            padding: 14px 12px; /* More padding */
+            text-align: left;
+            vertical-align: top; /* Keep top alignment for text cells */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+             line-height: 1.5; /* Open line height in cells */
+        }
+
+        th {
+            background-color: #eef2f7; /* Very light blueish-grey header */
+            color: var(--heading-color);
+            font-weight: 600;
+            vertical-align: middle; /* Keep middle for header text/small */
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            border-bottom: 2px solid var(--medium-grey); /* Stronger bottom border */
+        }
+         th small {
+             display: block;
+             font-weight: 400;
+             font-size: 0.8em; /* Smaller hint text */
+             color: var(--dark-grey);
+             margin-top: 5px;
+         }
+
+        /* Apply specific widths to columns (12 columns including Delete) */
+        /* Adjusted widths to provide more space for notes/remarks */
+        .semester-section th:nth-child(1), .semester-section td:nth-child(1) { width: 4%; }  /* Code */
+        .semester-section th:nth-child(2), .semester-section td:nth-child(2) { width: 11%; } /* Title */
+        .semester-section th:nth-child(3), .semester-section td:nth-child(3) { width: 4%; text-align: center; } /* Credits */
+        .semester-section th:nth-child(4), .semester-section td:nth-child(4) { width: 6%; }  /* Default RIBA (D) */
+        .semester-section th:nth-child(5), .semester-section td:nth-child(5) { width: 6%; }  /* Acad/Prac RIBA (D) */
+        .semester-section th:nth-child(6), .semester-section td:nth-child(6) { width: 12%; } /* Acad/Prac Notes */
+        .semester-section th:nth-child(7), .semester-section td:nth-child(7) { width: 6%; }  /* Ethics RIBA (D) */
+        .semester-section th:nth-child(8), .semester-section td:nth-child(8) { width: 12%; } /* Ethics Notes */
+        .semester-section th:nth-child(9), .semester-section td:nth-child(9) { width: 6%; }  /* Tech RIBA (D) */
+        .semester-section th:nth-child(10), .semester-section td:nth-child(10){ width: 12%; }/* Tech Notes */
+        .semester-section th:nth-child(11), .semester-section td:nth-child(11){ width: 6%; }  /* Remarks */
+        .semester-section th:nth-child(12), .semester-section td:nth-child(12){ width: 2%; text-align: center;} /* Actions */
+
+
+        tbody tr:nth-child(even) {
+            background-color: var(--f8f9fa); /* Very subtle zebra striping */
+        }
+
+        tbody tr:hover:not(.total-credits-row) {
+            background-color: var(--highlight-color); /* Light blue hover */
+        }
+
+        td[contenteditable="true"] {
+            background-color: var(--container-bg);
+            cursor: text;
+            min-height: 35px; /* Ensure space for editing */
+            outline: none;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+             white-space: pre-wrap; /* Ensure line breaks are respected */
+        }
+
+        td[contenteditable="true"]:hover {
+             background-color: var(--editable-bg); /* Hint on hover */
+        }
+
+        td[contenteditable="true"]:focus {
+            background-color: var(--highlight-color);
+            box-shadow: inset 0 0 0 1px var(--primary-color); /* Inner border on focus */
+        }
+
+        /* Styling for RIBA dropdown cell */
+        td.riba-cell {
+             background-color: var(--container-bg);
+             padding: 8px 6px; /* Adjusted padding for select */
+             vertical-align: top; /* <-- Changed from middle */
+             min-height: 35px; /* Match other editable cells */
+        }
+
+        select.riba-select {
+            width: 100%;
+            padding: 8px 6px; /* Adjusted padding */
+            border: 1px solid var(--medium-grey);
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9em;
+            background-color: var(--container-bg);
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23555%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center; /* More space for arrow */
+            background-size: 12px auto; /* Slightly larger arrow */
+            cursor: pointer;
+             vertical-align: top; /* Ensure select box itself aligns top */
+        }
+        select.riba-select:focus {
+             outline: none;
+             border-color: var(--primary-color);
+             box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.2);
+        }
+         select.riba-select option {
+             padding: 4px;
+         }
+
+
+        /* Styling for the total credits row */
+        .total-credits-row td {
+            background-color: #e9ecef;
+            font-weight: 600; /* Slightly less bold */
+            color: var(--heading-color);
+            border-top: 2px solid var(--medium-grey);
+            vertical-align: middle;
+            padding: 14px 12px; /* Match row padding */
+        }
+        .total-credits-row td:first-child { text-align: right; padding-right: 20px;} /* More space */
+        .total-credits-row td:nth-child(2) { /* Total Credits Number */
+            font-size: 1.1em;
+            text-align: center;
+            font-weight: 700; /* Make number bolder */
+            color: var(--primary-dark); /* Highlight total */
+        }
+         /* The third TD in total row now spans the remaining columns visually */
+        .total-credits-row td:nth-child(3) {
+             background-color: transparent;
+        }
+
+
+        /* General Notes Area */
+        #general-notes-section {
+             margin-top: 60px; /* More space above */
+        }
+        #general-notes-area {
+            width: 100%;
+            min-height: 200px; /* Taller textarea */
+            padding: 15px;
+            border: 1px solid var(--medium-grey);
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+            box-sizing: border-box;
+            resize: vertical;
+             outline: none;
+             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+             line-height: 1.6;
+             white-space: pre-wrap; /* Ensure line breaks */
+        }
+         #general-notes-area:focus {
+             border-color: var(--primary-color);
+             box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.2);
+         }
+
+        /* Buttons */
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 13px 28px; /* Slightly larger padding */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1em;
+            border-radius: 6px; /* Slightly more rounded */
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 20px; /* More space above buttons */
+            margin-right: 10px;
+            font-weight: 500; /* Medium weight */
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        button:active {
+             background-color: #00548c;
+             box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #save-button {
+             background-color: var(--secondary-dark); /* Use a related blue */
+             padding: 13px 35px; /* Make save button slightly larger */
+             font-weight: 600;
+        }
+        #save-button:hover {
+             background-color: var(--secondary-color);
+        }
+         #save-button:active {
+             background-color: var(--primary-dark); /* Darken on click */
+         }
+
+
+        .add-course-button-container {
+             margin-top: 15px; /* Space above add button */
+             text-align: left; /* Align add button left */
+        }
+         .action-buttons {
+             text-align: center;
+             margin-top: 50px; /* More space above global action buttons */
+         }
+
+
+        /* Delete button specific styles */
+        td.delete-cell {
+             text-align: center;
+             vertical-align: middle;
+             padding: 10px 6px; /* Adjusted padding to be less */
+        }
+        .delete-row-button {
+             background: none;
+             border: none;
+             color: var(--delete-color); /* Red color for delete */
+             font-size: 1.3em; /* Slightly larger icon */
+             cursor: pointer;
+             padding: 4px; /* Reduced padding */
+             margin: 0;
+             transition: color 0.2s ease;
+             line-height: 1;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+        }
+        .delete-row-button:hover {
+             color: var(--delete-dark);
+             background: none;
+             box-shadow: none;
+        }
+         .delete-row-button:active {
+             color: #a93226; /* Even darker red */
+             background: none;
+             box-shadow: none;
+         }
+
+        /* New styles for Unused RIBA Themes section */
+        .unused-riba-section {
+            margin-top: 25px;
+            margin-bottom: 30px;
+            padding: 15px 20px;
+            background-color: var(--unused-bg);
+            border: 1px solid var(--unused-border);
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: var(--unused-text);
+            line-height: 1.5;
+        }
+         .unused-riba-section p {
+             margin: 0; /* Remove default paragraph margin */
+             white-space: pre-wrap; /* Preserve line breaks if needed */
+         }
+         .unused-riba-section strong {
+             color: var(--unused-text); /* Ensure title is also dark red */
+         }
+
+        /* New styles for RIBA Summary Table section */
+        .riba-summary-section {
+             margin-top: 60px; /* Space above this section */
+             margin-bottom: 40px; /* Space below */
+        }
+
+        .riba-summary-section .table-responsive {
+             /* Adjust min-width if needed, but 12 columns might fit better than 1700px */
+             min-width: 1000px; /* Example smaller min-width for summary */
+        }
+
+
+        #riba-summary-table th {
+             background-color: var(--summary-header-bg); /* Darker blue for summary header */
+             color: var(--summary-header-text); /* White text */
+             font-weight: 600;
+             border-color: var(--primary-dark); /* Stronger border */
+             text-align: center; /* Center header text */
+             vertical-align: middle;
+             padding: 10px 8px; /* Slightly less padding than main table headers */
+        }
+         #riba-summary-table th:first-child {
+             text-align: left; /* Align theme name left */
+             background-color: #eef2f7; /* Match main table header background */
+             color: var(--heading-color); /* Match main table header text */
+             border-color: var(--medium-grey);
+             position: sticky; /* Sticky theme column */
+             left: 0;
+             z-index: 2; /* Higher z-index than sticky header */
+         }
+
+         #riba-summary-table td {
+             text-align: center; /* Center count numbers */
+             vertical-align: middle;
+             padding: 8px 6px; /* Less padding for numbers */
+             background-color: var(--summary-bg); /* Light background for body */
+         }
+
+         #riba-summary-table tbody tr:nth-child(even) td {
+              background-color: var(--light-grey); /* Subtle zebra for rows */
+         }
+
+         #riba-summary-table td:first-child {
+              text-align: left; /* Align theme name left */
+              font-weight: 500; /* Medium weight for theme name */
+              background-color: var(--container-bg); /* White background for theme cell */
+              position: sticky; /* Sticky theme cell */
+              left: 0;
+              z-index: 1; /* Lower z-index than sticky header */
+         }
+         #riba-summary-table tr:hover td {
+             background-color: var(--highlight-color); /* Highlight on hover */
+         }
+          #riba-summary-table tr:hover td:first-child {
+             background-color: var(--highlight-color); /* Ensure sticky cell also highlights */
+          }
+
+
+        /* Optional: Toast/Notification for save */
+        .save-notification {
+            position: fixed;
+            bottom: 25px; /* Higher from bottom */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745; /* Success green */
+            color: white;
+            padding: 14px 25px; /* More padding */
+            border-radius: 6px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+             font-size: 1em;
+             font-weight: 500;
+        }
+        .save-notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+         .save-notification.error {
+             background-color: #dc3545; /* Error red */
+         }
+
+        /* Ensure textarea in notes/remarks preserves spaces */
+        /* This is handled by white-space: pre-wrap and innerHTML/value */
+
+        /* --- End of Refined CSS v6 --- */
+    </style>
+</head>
+<body>
+
+<div class="curriculum-planner">
+    <h1>B.Arch. Curriculum Planner 2025</h1>
+    <h2>Nitte Institute of Architecture - Based on Batch 2020-21 Regulations</h2>
+    <p class="instructions"><em>Click on table cells or summary paragraphs to edit. Use dropdowns for Default and Direct RIBA theme connections. Credit totals update automatically. Unused RIBA themes per semester are listed below each table. Use the 'Save Planner' button to store your edits locally in your browser. Delete rows using the <span style="color: var(--delete-color); font-weight: 600;">&times;</span> button in the Actions column.</em></p>
+
+    <!-- --- Semester Tables (Sem 1 to 10) --- -->
+
+    <!-- Semester 1 -->
+    <div class="semester-section">
+        <h3>Semester 1 (Level 1: Foundation)</h3>
+        <p class="semester-summary" id="sem1-summary" contenteditable="true">
+            **Overall Theme:** Fundamentals of Design and Representation<br>
+            **Focus:** This semester lays the essential groundwork for the entire program. The focus is on developing fundamental visual literacy, manual and basic digital representation skills, introducing foundational design concepts, and understanding the basic physics influencing the built environment. It's about learning the initial language and tools of architecture. Successful completion is crucial as it provides the basic toolkit required for all subsequent design and technical studies.
+        </p>
+        <div class="table-responsive">
+        <table id="sem1-table">
+            <thead>
+                <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR11</td>
+                    <td contenteditable="true" spellcheck="false">Foundation Studio</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">12</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Intro Digital Fabrication (3D Print, Laser Cut workshop). Digital Models.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td> <!-- Delete Button -->
+                </tr>
+                 <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR12</td>
+                    <td contenteditable="true" spellcheck="false">Culturescapes</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR13</td>
+                    <td contenteditable="true" spellcheck="false">Environment and Building Physics</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">6</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Basic Climate Analysis Tools (Climate Consultant or similar). Climate Data Viz.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR14</td>
+                    <td contenteditable="true" spellcheck="false">Architectural and Visual Representation</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Intro 2D CAD (AutoCAD). Digital Graphics & Presentation (Adobe PS, AI, ID).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <!-- Total Credits Row -->
+                <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 1 Total</strong></td>
+                    <td><strong>0</strong></td> <!-- Credits Total -->
+                    <td colspan="9"></td> <!-- Spans remaining columns -->
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem1-table')">Add Course to Semester 1</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem1-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+    <!-- Semester 2 -->
+     <div class="semester-section">
+        <h3>Semester 2 (Level 1: Foundation)</h3>
+        <p class="semester-summary" id="sem2-summary" contenteditable="true">
+            **Overall Theme:** Introduction to Architectural Design and Spatial Thinking<br>
+            **Focus:** Building on the foundations of Sem 1, this semester introduces students to the core activity of architectural design within a simplified context. Emphasis is placed on developing spatial awareness, applying basic structural/environmental principles, and using both physical models and introductory 3D digital tools (like SketchUp) to explore form and space. The Communication course refines the representation skills acquired in Sem 1. This semester solidifies the transition from abstract principles to concrete design exploration and sets the stage for tackling more complex design problems in Level 2.
+        </p>
+        <div class="table-responsive">
+        <table id="sem2-table">
+            <thead>
+                <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR21</td>
+                    <td contenteditable="true" spellcheck="false">Introduction to Architectural Design</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">12</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Intro 3D Modeling (SketchUp). Digital Models + Physical Prototypes.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR22</td>
+                    <td contenteditable="true" spellcheck="false">Architecture and Change</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR23</td>
+                    <td contenteditable="true" spellcheck="false">Climate, Site and Superstructure</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">6</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Climate Data Viz.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR24</td>
+                    <td contenteditable="true" spellcheck="false">Graphics and Communication</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Digital Drawing & Graphics (CAD, Adobe Suite).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 2 Total</strong></td>
+                    <td><strong>0</strong></td>
+                     <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem2-table')">Add Course to Semester 2</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem2-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+    <!-- Semester 3 -->
+    <div class="semester-section">
+        <h3>Semester 3 (Level 2: Development)</h3>
+        <p class="semester-summary" id="sem3-summary" contenteditable="true">
+            **Overall Theme:** Integrated Design and Workflow Development<br>
+            **Focus:** This semester marks the beginning of Level 2, focusing on developing more integrated design approaches. A key milestone is the mandatory introduction of BIM (Revit) within the studio, shifting from basic representation to integrated building information modeling. Technical courses delve deeper into environmental and structural principles with introductory simulation concepts. Electives offer initial exposure to computational design and coding, expanding the digital toolkit. This semester emphasizes connecting different aspects of architectural knowledge and introducing essential digital workflows for the rest of the program.
+        </p>
+        <div class="table-responsive">
+        <table id="sem3-table">
+             <thead>
+                 <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR31</td>
+                    <td contenteditable="true" spellcheck="false">S3 Vertical Studio</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">12</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Mandatory BIM Introduction (Revit). Intermediate Rendering & Collaboration (Enscape/V-Ray, Miro). Milestone.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR32</td>
+                    <td contenteditable="true" spellcheck="false">History and Construction</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR33</td>
+                    <td contenteditable="true" spellcheck="false">Environment and Building Structures</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">6</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Basic Env. Simulation (Ladybug Tools). Intro Structural Analysis concepts/SW (e.g., STAAD Pro, ETABS).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L2)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(One L2 Elective Recommended). Options: Intro Computational Design (Rhino + GH - Milestone), Python Basics (VAC?).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 3 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem3-table')">Add Course to Semester 3</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem3-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+    <!-- Semester 4 -->
+    <div class="semester-section">
+        <h3>Semester 4 (Level 2: Development)</h3>
+         <p class="semester-summary" id="sem4-summary" contenteditable="true">
+            **Overall Theme:** Design of Habitable Environments<br>
+            **Focus:** Applying the integrated workflow introduced in Sem 3, this semester focuses on the complex programmatic and spatial requirements of housing design. Students consolidate their BIM proficiency by developing detailed housing projects. Technical studies continue to build knowledge of building systems, incorporating basic simulation for specific aspects like lighting. This semester deepens the understanding of designing for human needs and provides a solid foundation for more specialized building types in later studios.
+        </p>
+        <div class="table-responsive">
+        <table id="sem4-table">
+             <thead>
+                <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR41</td>
+                    <td contenteditable="true" spellcheck="false">Housing Studio</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">12</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">BIM application (Revit - Milestone). Rendering & Collaboration (Enscape/V-Ray, Miro).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR42</td>
+                    <td contenteditable="true" spellcheck="false">History and Urbanism 1</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR43</td>
+                    <td contenteditable="true" spellcheck="false">Building Systems & Electrical Services</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">6</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Basic Lighting Simulation.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L2)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(One L2 Elective Recommended). Options: Continue Comp Design, Python, etc.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 4 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem4-table')">Add Course to Semester 4</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem4-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+     <!-- Semester 5 -->
+    <div class="semester-section">
+        <h3>Semester 5 (Level 2: Development)</h3>
+         <p class="semester-summary" id="sem5-summary" contenteditable="true">
+            **Overall Theme:** Technical Resolution and Advanced Digital Exploration<br>
+            **Focus:** This semester pushes students toward greater technical understanding and introduces more advanced digital methodologies. Detailing focuses on the practicalities of construction, while the studio and electives integrate sophisticated tools like computational design (Grasshopper) for complex forms/analysis, real-time rendering, and emerging technologies like AI and robotics. This semester deepens technical knowledge, broadens the digital skill set, and prepares students for the professional internship by exposing them to tools increasingly relevant in practice.
+        </p>
+        <div class="table-responsive">
+        <table id="sem5-table">
+             <thead>
+                 <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                 <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR51</td>
+                    <td contenteditable="true" spellcheck="false">S5 Vertical Studio</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">12</td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Advanced BIM Application (Revit). Computational Design Application (Grasshopper for Form-finding, Analysis). Real-time Rendering (Lumion, D5 Render).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR52</td>
+                    <td contenteditable="true" spellcheck="false">History and Urbanism 2</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR53</td>
+                    <td contenteditable="true" spellcheck="false">Building Detailing & Valuation</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">6</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Advanced BIM Application (Revit Details).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L2)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(One L2 Elective Recommended). Options: Intro AI in Arch (Milestone, e.g., concepts, Rayan.design), Intro Digital Fab/Robotics (Workflows, CNC - Milestone).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 5 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                 </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem5-table')">Add Course to Semester 5</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem5-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+     <!-- Semester 6 -->
+    <div class="semester-section">
+        <h3>Semester 6 (Level 2: Development)</h3>
+         <p class="semester-summary" id="sem6-summary" contenteditable="true">
+            **Overall Theme:** Applied Professional Practice<br>
+            **Focus:** This is a dedicated semester for practical, real-world experience through a full-time internship. The focus shifts from academic learning to applying accumulated knowledge, skills, and digital proficiency (BIM, CAD, etc.) in a professional architectural office or related setting. It's a crucial period for understanding industry workflows, project management, ethical considerations, and communication within a team. This exposure bridges theory and practice, informing future academic choices and the final thesis project.
+        </p>
+        <div class="table-responsive">
+        <table id="sem6-table">
+             <thead>
+                 <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR65</td>
+                    <td contenteditable="true" spellcheck="false">Co-operative Learning</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">24</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Industry Software Exposure (Revit, CAD, etc.). Full semester internship/practical training.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 6 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem6-table')">Add Course to Semester 6</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem6-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+     <!-- Semester 7 -->
+    <div class="semester-section">
+        <h3>Semester 7 (Level 3: Specialization & Application)</h3>
+        <p class="semester-summary" id="sem7-summary" contenteditable="true">
+            **Overall Theme:** Urban Scale and Specialized Exploration<br>
+            **Focus:** Transitioning to Level 3, the focus expands to the urban scale, requiring new tools like GIS and advanced data analysis for site understanding. Technical studies introduce complex simulations (CFD, ENVI-met) for deeper environmental understanding. Crucially, Level 3 Electives allow students to begin specializing in areas like advanced computation, AI, robotics, or visualization. This semester is about handling complexity at a larger scale and charting individual pathways toward specialization, setting the stage for thesis research and advanced studios.
+        </p>
+        <div class="table-responsive">
+        <table id="sem7-table">
+             <thead>
+                 <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR71</td>
+                    <td contenteditable="true" spellcheck="false">Urban Studio / Exchange Studio</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">12</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">GIS (ArcGIS/QGIS). Data Viz. Photogrammetry SW.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR73</td>
+                    <td contenteditable="true" spellcheck="false">Building Systems and Practices</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">6</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Advanced Simulation (DesignBuilder, Autodesk CFD, ENVI-met).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L3/Open/Global)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(Two Electives Recommended). Options: Adv. Comp Design, AI Apps (e.g., Rayan.design applications), Robotics in Fab, AR/VR, Adv. Viz.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L3/Open/Global)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(See above).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 7 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem7-table')">Add Course to Semester 7</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem7-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+    <!-- Semester 8 -->
+    <div class="semester-section">
+        <h3>Semester 8 (Level 3: Specialization & Application)</h3>
+        <p class="semester-summary" id="sem8-summary" contenteditable="true">
+            **Overall Theme:** Research and Thematic Design Application<br>
+            **Focus:** This semester allows students to apply their developing specialization and research skills within thematic vertical studios and the independent Dissertation. Studios offer options like Conservation, Sustainability, etc., where students can integrate specific advanced tools (Scan-to-BIM, advanced simulation, structural analysis software) relevant to the theme. The Dissertation focuses on developing research methodologies and critical thinking, often supported by digital analysis tools. This semester links specialized academic inquiry with targeted design exploration.
+        </p>
+        <div class="table-responsive">
+        <table id="sem8-table">
+            <thead>
+                 <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR81 X*</td>
+                    <td contenteditable="true" spellcheck="false">Vertical Studio 2</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">12</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(Options: Adv. Design, Cons., Landscape, Sustain., Urban Housing). Tech applied contextually, e.g., Scan-to-BIM in Conservation, Simulation in Sustainability, Structural analysis (STAAD/ETABS), BIM Coordination (Navisworks?).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR83</td>
+                    <td contenteditable="true" spellcheck="false">Management and Interior Systems</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">6</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR85</td>
+                    <td contenteditable="true" spellcheck="false">Dissertation</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Research Tools, Data Analysis (Python/AI tools?).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L3/Open/Global)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(One Elective Recommended). Specialize based on Sem 7 choices.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 8 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem8-table')">Add Course to Semester 8</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem8-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+     <!-- Semester 9 -->
+     <div class="semester-section">
+        <h3>Semester 9 (Level 3: Specialization & Application)</h3>
+        <p class="semester-summary" id="sem9-summary" contenteditable="true">
+            **Overall Theme:** Professional Consolidation and Practical Application<br>
+            **Focus:** A second full-semester internship offers deeper engagement with professional practice. This period is crucial for consolidating all academic learning, including design, technical, and digital skills, in a real-world context. Students apply integrated BIM workflows, project management concepts, and ethical reasoning learned in previous semesters. The focus is on gaining confidence, understanding the business realities of practice, and preparing for entry into the profession immediately after graduation.
+        </p>
+        <div class="table-responsive">
+        <table id="sem9-table">
+             <thead>
+                 <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR95</td>
+                    <td contenteditable="true" spellcheck="false">Internship</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">24</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Real-world Application (Revit, Rhino, GIS, CAD, Project Management SW, Navisworks, etc.). Full semester internship.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 9 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem9-table')">Add Course to Semester 9</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem9-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+     <!-- Semester 10 -->
+    <div class="semester-section">
+        <h3>Semester 10 (Level 3: Specialization & Application)</h3>
+        <p class="semester-summary" id="sem10-summary" contenteditable="true">
+            **Overall Theme:** Mastery and Professional Readiness (Thesis/Capstone)<br>
+            **Focus:** The final semester culminates in the Architectural Thesis or Capstone Project, a self-directed undertaking synthesizing all academic knowledge and practical internship experience. Students demonstrate mastery by applying advanced design methodologies, integrating complex technical systems (building on Sem 7), leveraging specialized digital tools based on project needs (computational design, simulation, fabrication, BIM coordination), and presenting their work professionally using advanced visualization techniques (VR/AR). The Professional Practice course directly addresses the business and ethical aspects of entering the profession, ensuring graduates are well-rounded and ready for licensure and practice.
+        </p>
+        <div class="table-responsive">
+        <table id="sem10-table">
+             <thead>
+                 <tr> <!-- 12 Columns -->
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Credits</th>
+                    <th>Default RIBA<br><small>(Main Theme)</small></th>
+                    <th>Acad/Prac RIBA<br><small>(Direct)</small></th>
+                    <th>Academic & Practice Notes</th>
+                    <th>Ethics RIBA<br><small>(Direct)</small></th>
+                    <th>Ethics & Comm. Notes</th>
+                    <th>Tech RIBA<br><small>(Direct)</small></th>
+                    <th>Tech Integration Notes</th>
+                    <th>Remarks</th>
+                    <th>x</th> <!-- Keeping header as "x" -->
+                </tr>
+            </thead>
+            <tbody>
+                 <tr> <!-- 12 Cells -->
+                    <td contenteditable="true" spellcheck="false">20BAR 101X*</td>
+                    <td contenteditable="true" spellcheck="false">Architectural Thesis / Capstone Project</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">15</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Deep Tech Integration (Chosen tools: GH, AI (Rayan.design?), Fab, Simulation e.g., TRNSYS - Milestone). Advanced Visualization & VR/AR for presentation. BIM Coordination (Navisworks?).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR 105</td>
+                    <td contenteditable="true" spellcheck="false">Professional Practice</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">Digital Workflows, BIM Standards & Coordination (Navisworks), Collaboration tools (Miro, BIM360?).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L3/Open/Global)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(Two Electives Recommended). Final deep specialization.</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr>
+                    <td contenteditable="true" spellcheck="false">20BAR YY EX*</td>
+                    <td contenteditable="true" spellcheck="false">Elective* (L3/Open/Global)</td>
+                    <td contenteditable="true" data-cell-type="credits" spellcheck="false">3</td>
+                     <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="riba-cell"><select class="riba-select"></select></td>
+                    <td contenteditable="true" spellcheck="false">*(See above).</td>
+                    <td contenteditable="true" spellcheck="false"></td>
+                    <td class="delete-cell"><button class="delete-row-button" title="Delete Row">&times;</button></td>
+                </tr>
+                 <tr class="total-credits-row">
+                    <td colspan="2"><strong>Semester 10 Total</strong></td>
+                    <td><strong>0</strong></td>
+                    <td colspan="9"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div><!-- /.table-responsive -->
+         <div class="add-course-button-container">
+            <button onclick="addCourse('sem10-table')">Add Course to Semester 10</button>
+         </div>
+         <!-- Unused RIBA Themes Section -->
+        <div class="unused-riba-section">
+            <p><strong>Unused RIBA Themes in this Semester:</strong> <span id="sem10-unused-riba-list">Calculating...</span></p>
+        </div>
+    </div>
+
+    <!-- --- RIBA Theme Usage Summary Table --- -->
+    <div class="riba-summary-section">
+        <h4>RIBA Theme Usage Summary</h4>
+        <div class="table-responsive">
+            <table id="riba-summary-table">
+                <thead>
+                    <tr>
+                        <th>RIBA Theme</th>
+                        <th>Sem 1</th>
+                        <th>Sem 2</th>
+                        <th>Sem 3</th>
+                        <th>Sem 4</th>
+                        <th>Sem 5</th>
+                        <th>Sem 6</th>
+                        <th>Sem 7</th>
+                        <th>Sem 8</th>
+                        <th>Sem 9</th>
+                        <th>Sem 10</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div><!-- /.table-responsive -->
+    </div>
+
+
+    <!-- General Notes Section -->
+    <div id="general-notes-section">
+        <h4>General Notes</h4>
+        <textarea id="general-notes-area" placeholder="Enter any overall notes about the curriculum plan, technology choices, RIBA mapping, or implementation here..." spellcheck="false"></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button id="save-button" onclick="saveData()">Save Planner</button>
+    </div>
+
+    <!-- Save Notification -->
+    <div id="save-notification" class="save-notification" role="alert">Planner saved successfully!</div>
+
+</div><!-- /.curriculum-planner -->
+
+<script>
+    /* --- Start of Refined JavaScript v7 (5yr with RIBA Summary Table) --- */
+    const ribaThemes = [
+        "Health & Life Safety", "Ethics", "Professional Practice", "Structures",
+        "Construction", "Resources", "History", "Theory & Methodologies",
+        "Design Pedagogies", "Architectural Expression", "Business Skills",
+        "Climate Literacy", "Research Literacy"
+    ];
+    // Updated Key for this version
+    const localStorageKey = 'bArchCurriculumData_Nitte_V7yr_RIBA_Summary'; // Version 7 key
+
+     // Array of semester IDs for easier looping
+    const semesterIds = ['sem1', 'sem2', 'sem3', 'sem4', 'sem5', 'sem6', 'sem7', 'sem8', 'sem9', 'sem10'];
+
+
+    // --- Populate RIBA Dropdowns ---
+    function populateRibaSelect(selectElement, selectedValue = "") {
+        // Store current value if it exists
+        const currentValue = selectedValue || selectElement.value;
+
+        // Clear existing options
+        selectElement.innerHTML = '';
+
+        // Add a default "Select" option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "Select";
+        selectElement.appendChild(defaultOption);
+
+        // Add RIBA themes
+        ribaThemes.forEach(theme => {
+            const option = document.createElement('option');
+            option.value = theme;
+            option.textContent = theme;
+            selectElement.appendChild(option);
+        });
+
+        // Set the selected value after populating
+        // Ensure the value is actually one of the options, otherwise default to "Select"
+        if (currentValue && selectElement.querySelector(`option[value="${currentValue}"]`)) {
+             selectElement.value = currentValue;
+        } else {
+             selectElement.value = ""; // Default to "Select" if value is null, empty, or invalid
+        }
+    }
+
+    function initializeRibaDropdowns() {
+        const allSelects = document.querySelectorAll('select.riba-select');
+        allSelects.forEach(select => {
+            // Capture the initial value from the HTML before populating
+            const initialValue = select.getAttribute('value') || select.value;
+            populateRibaSelect(select, initialValue);
+             // Remove value attribute after populating to prevent issues
+             select.removeAttribute('value');
+        });
+    }
+
+
+    // --- Calculate Semester Credits ---
+    function calculateSemesterCredits(tableId) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        // Select credit cells using the data attribute for robustness
+        const creditCells = table.querySelectorAll('tbody tr:not(.total-credits-row) td[data-cell-type="credits"]');
+        let totalCredits = 0;
+        creditCells.forEach(cell => {
+            // Use textContent for safety and trim whitespace
+            const creditValue = parseInt(cell.textContent.trim()) || 0;
+            totalCredits += creditValue;
+        });
+        const totalCell = table.querySelector('tbody tr.total-credits-row td:nth-child(2)'); // The cell displaying the total
+        if (totalCell) {
+            totalCell.textContent = totalCredits;
+        } else {
+             console.warn("Could not find total credits cell for table:", tableId);
+        }
+    }
+
+     // --- Calculate All Semester Credits ---
+     function calculateAllSemestersCredits() {
+        semesterIds.forEach(semId => {
+             const tableId = `${semId}-table`;
+             // Check if table exists before calculating
+             if(document.getElementById(tableId)){
+                 calculateSemesterCredits(tableId);
+             }
+         });
+     }
+
+     // --- Calculate and Display Unused RIBA Themes for a Semester ---
+     function calculateUnusedRiba(tableId) {
+         const table = document.getElementById(tableId);
+         if (!table) return;
+
+         // Find the span element where the list should be displayed
+         const unusedListId = tableId.replace('-table', '-unused-riba-list');
+         const unusedListElement = document.getElementById(unusedListId);
+         if (!unusedListElement) {
+             console.warn(`Could not find unused RIBA list element with ID: ${unusedListId}`);
+             return;
+         }
+
+         // Get all selected RIBA themes in this table
+         // Selects are in columns 3, 4, 6, 8 (0-indexed are 3, 4, 6, 8) - these indices match the CSS
+         const selectElements = table.querySelectorAll('tbody tr:not(.total-credits-row) td:nth-child(4) select, tbody tr:not(.total-credits-row) td:nth-child(5) select, tbody tr:not(.total-credits-row) td:nth-child(7) select, tbody tr:not(.total-credits-row) td:nth-child(9) select');
+         const usedThemes = new Set();
+
+         selectElements.forEach(select => {
+             const value = select.value.trim();
+             // Only add if a theme is actually selected AND it's one of the valid themes
+             if (value !== "" && ribaThemes.includes(value)) {
+                 usedThemes.add(value);
+             }
+         });
+
+         // Determine unused themes
+         const unusedThemes = ribaThemes.filter(theme => !usedThemes.has(theme));
+
+         // Update the display
+         if (unusedThemes.length === 0) {
+             unusedListElement.textContent = "All RIBA themes used!";
+         } else {
+             unusedListElement.textContent = unusedThemes.join(', ');
+         }
+     }
+
+    // --- Calculate All Semester Unused RIBA Themes ---
+    function calculateAllSemestersUnusedRiba() {
+        semesterIds.forEach(semId => {
+             const tableId = `${semId}-table`;
+              // Check if table exists before calculating
+              if(document.getElementById(tableId)){
+                  calculateUnusedRiba(tableId);
+              }
+         });
+    }
+
+    // --- Update RIBA Summary Table ---
+    function updateRibaSummaryTable() {
+        const summaryTableBody = document.querySelector('#riba-summary-table tbody');
+        if (!summaryTableBody) {
+            console.error("RIBA summary table body not found.");
+            return;
+        }
+
+        // Clear existing content
+        summaryTableBody.innerHTML = '';
+
+        // Initialize counts structure { theme: { sem1: 0, sem2: 0, ..., sem10: 0, total: 0 } }
+        const themeCounts = {};
+        ribaThemes.forEach(theme => {
+            themeCounts[theme] = { total: 0 };
+            semesterIds.forEach(semId => {
+                themeCounts[theme][semId] = 0;
+            });
+        });
+
+        // Iterate through each semester table
+        semesterIds.forEach(semId => {
+            const table = document.getElementById(`${semId}-table`);
+            if (!table) return;
+
+            const rows = table.querySelectorAll('tbody tr:not(.total-credits-row)');
+
+            // Iterate through each course row in the semester
+            rows.forEach(row => {
+                const selectElements = row.querySelectorAll('td select.riba-select'); // Get all selects in the row
+                 selectElements.forEach(select => {
+                    const selectedTheme = select.value.trim();
+                    // Only count if a theme is selected and it's a valid RIBA theme
+                    if (selectedTheme !== "" && ribaThemes.includes(selectedTheme)) {
+                         if (themeCounts[selectedTheme]) { // Check if theme exists in our counts structure
+                              themeCounts[selectedTheme][semId]++;
+                              themeCounts[selectedTheme].total++;
+                         } else {
+                             // This case should ideally not happen if ribaThemes is comprehensive
+                             console.warn(`Unexpected theme selected: ${selectedTheme}`);
+                         }
+                    }
+                });
+            });
+        });
+
+        // Populate the summary table body
+        ribaThemes.forEach(theme => {
+            const row = document.createElement('tr');
+
+            // Theme name cell (sticky left)
+            const themeCell = document.createElement('td'); // Using td for content, th in header
+            themeCell.textContent = theme;
+            row.appendChild(themeCell);
+
+            // Counts per semester
+            semesterIds.forEach(semId => {
+                const countCell = document.createElement('td');
+                countCell.textContent = themeCounts[theme][semId] || 0; // Display count, default to 0
+                row.appendChild(countCell);
+            });
+
+            // Total count cell
+            const totalCell = document.createElement('td');
+            totalCell.textContent = themeCounts[theme].total || 0; // Display total count, default to 0
+            totalCell.style.fontWeight = 'bold'; // Make total count bold
+            totalCell.style.color = 'var(--primary-dark)'; // Highlight total
+            row.appendChild(totalCell);
+
+
+            summaryTableBody.appendChild(row);
+        });
+    }
+
+
+    // --- Add Course Functionality ---
+    function addCourseRevised(tableId, courseData = null) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const totalRow = tbody.querySelector('.total-credits-row');
+        const newRow = document.createElement('tr');
+
+        // Helper to create cells - handles 12 columns (11 data + 1 delete)
+        const createCell = (content = "", isEditable = true, cellIndex, type = 'text') => {
+            const cell = document.createElement('td');
+            cell.setAttribute('spellcheck', 'false'); // Disable spellcheck for all editable cells
+
+            if (type === 'select') {
+                cell.classList.add('riba-cell');
+                const select = document.createElement('select');
+                select.classList.add('riba-select');
+                // Set the initial value as an attribute, populateDropdown will read this
+                if (content) {
+                     select.setAttribute('value', content);
+                }
+                cell.appendChild(select);
+                cell.setAttribute('contenteditable', 'false'); // Selects are not contenteditable
+            } else if (type === 'delete') {
+                 cell.classList.add('delete-cell');
+                 const deleteButton = document.createElement('button');
+                 deleteButton.classList.add('delete-row-button');
+                 deleteButton.innerHTML = '&times;';
+                 deleteButton.title = 'Delete Row';
+                 // Event listener added via delegation later
+                 cell.appendChild(deleteButton);
+                 cell.setAttribute('contenteditable', 'false'); // Button cell is not contenteditable
+            }
+             else { // Text or rich content editable cells
+                 cell.setAttribute('contenteditable', isEditable ? 'true' : 'false');
+
+                 // Use innerHTML for notes/remarks/summaries to preserve formatting, textContent for others
+                 // Indices 5, 7, 9, 10 are Notes/Remarks columns
+                 if (isEditable && (cellIndex === 5 || cellIndex === 7 || cellIndex === 9 || cellIndex === 10)) {
+                      cell.innerHTML = content; // Use innerHTML here for notes/remarks
+                 } else if (cellIndex === 2 && isEditable) {
+                     // Credits cell: ensure it's treated as text input for editing but stored as int
+                     cell.textContent = content; // Allow initial content as string "0" or number
+                     cell.setAttribute('data-cell-type', 'credits'); // Mark credits cell
+                 }
+                 else {
+                     cell.textContent = content; // Use textContent for simple fields (Code, Title)
+                 }
+            }
+
+            // Apply text alignment based on index (0-based)
+             if (cellIndex === 2) { cell.style.textAlign = 'center'; } // Credits column
+             if (cellIndex === 11) { cell.style.textAlign = 'center'; } // Actions column
+
+
+          return cell;
+     }
+
+        // Create 12 cells based on courseData or defaults
+        newRow.appendChild(createCell(courseData?.code, true, 0)); // Code
+        newRow.appendChild(createCell(courseData?.title, true, 1)); // Title
+        newRow.appendChild(createCell(courseData?.credits || "0", true, 2)); // Credits (uses data-cell-type)
+        newRow.appendChild(createCell(courseData?.defaultRibaTheme, false, 3, 'select')); // Default RIBA Select (Index 3)
+        newRow.appendChild(createCell(courseData?.acadRibaDirect, false, 4, 'select')); // Acad RIBA Select (Index 4)
+        newRow.appendChild(createCell(courseData?.academicNotes, true, 5));          // Acad Notes (innerHTML) (Index 5)
+        newRow.appendChild(createCell(courseData?.ethicsRibaDirect, false, 6, 'select')); // Ethics RIBA Select (Index 6)
+        newRow.appendChild(createCell(courseData?.ethicsNotes, true, 7));             // Ethics Notes (innerHTML) (Index 7)
+        newRow.appendChild(createCell(courseData?.techRibaDirect, false, 8, 'select'));   // Tech RIBA Select (Index 8)
+        newRow.appendChild(createCell(courseData?.techNotes, true, 9));               // Tech Notes (innerHTML) (Index 9)
+        newRow.appendChild(createCell(courseData?.remarks, true, 10));                // Remarks (innerHTML) (Index 10)
+        newRow.appendChild(createCell(null, false, 11, 'delete'));                   // Actions (Delete Button) (Index 11)
+
+
+        if (totalRow) {
+            tbody.insertBefore(newRow, totalRow);
+        } else {
+            tbody.appendChild(newRow);
+        }
+
+         // Populate dropdowns *after* the row is added to the DOM
+         newRow.querySelectorAll('select.riba-select').forEach(select => {
+             // Pass the value read from the 'value' attribute set by createCell
+             populateRibaSelect(select, select.getAttribute('value'));
+         });
+
+        calculateSemesterCredits(tableId);
+        calculateUnusedRiba(tableId); // Calculate unused RIBA after adding course
+        updateRibaSummaryTable(); // Update the summary table
+    }
+
+
+    // --- Event Handler for Credit Input ---
+     function handleCreditInput(event) {
+         const cell = event.target;
+         // Use a regex that allows only digits
+         let sanitizedValue = cell.textContent.replace(/[^0-9]/g, '');
+
+         // Update cell content if needed and prevent cursor jump
+         if (cell.textContent !== sanitizedValue) {
+             // Save current cursor position
+             const selection = window.getSelection();
+             const range = document.createRange();
+             let startOffset = selection.anchorOffset;
+             let node = selection.anchorNode; // Node where the cursor is
+
+             cell.textContent = sanitizedValue; // Update the content
+
+             // Restore cursor position
+             if (node && cell.contains(node)) {
+                 // Find the new text node (should be the only child if only text)
+                 const textNode = cell.firstChild;
+                 if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                     // Ensure startOffset doesn't exceed the new text length
+                     startOffset = Math.min(startOffset, textNode.length);
+                     try {
+                         range.setStart(textNode, startOffset);
+                         range.collapse(true);
+                         selection.removeAllRanges();
+                         selection.addRange(range);
+                     } catch (e) {
+                         console.error("Could not set selection:", e);
+                         // Fallback: focus the cell without specific cursor position
+                         cell.focus();
+                     }
+                 } else {
+                      // If the cell is now empty or has non-text content after sanitization
+                      cell.focus(); // Focus the cell to keep editing active
+                 }
+             } else {
+                 // If the cursor was outside the cell or the node structure changed drastically
+                 cell.focus(); // Focus the cell
+             }
+         }
+
+         const table = cell.closest('table');
+         if (table && table.id) {
+             // Debounce the calculation slightly
+             clearTimeout(cell._creditCalcTimer); // Clear any pending timer
+             cell._creditCalcTimer = setTimeout(() => calculateSemesterCredits(table.id), 150); // Calculate after 150ms
+         }
+     }
+
+     // --- Event Handler for Delete Row ---
+     function handleDeleteRow(event) {
+         // Check if the clicked element or its parent is the delete button
+         const button = event.target.closest('.delete-row-button');
+         if (!button) return; // Not a delete button click
+
+         const row = button.closest('tr');
+         if (!row) return; // Should not happen if button is found
+
+         const table = row.closest('table');
+         if (!table) return; // Should not happen if row is in a table
+
+         // --- ADD CONFIRMATION DIALOG ---
+         const cells = row.getElementsByTagName('td');
+         let courseTitle = "this course";
+         // Check cell index 1 for the title
+         if (cells.length > 1 && cells[1].textContent.trim()) {
+              courseTitle = `"${cells[1].textContent.trim()}"`;
+         }
+
+         if (!confirm(`Are you sure you want to delete ${courseTitle}? This action cannot be undone.`)) {
+             return; // If user clicks Cancel, stop here
+         }
+         // --- END CONFIRMATION DIALOG ---
+
+         const tableId = table.id; // Get tableId before removing the row
+         row.remove(); // Remove the row from the DOM
+
+         calculateSemesterCredits(tableId); // Recalculate credits for the semester table
+         calculateUnusedRiba(tableId); // Recalculate unused RIBA for the semester table
+         updateRibaSummaryTable(); // Update the summary table
+         // Optional: show a notification for deletion? "Course deleted"?
+     }
+
+     // --- Event Handler for RIBA Select Change ---
+     function handleRibaSelectChange(event) {
+         if (event.target.tagName === 'SELECT' && event.target.classList.contains('riba-select')) {
+             const table = event.target.closest('table');
+             if (table && table.id) {
+                 calculateUnusedRiba(table.id); // Recalculate unused RIBA for the affected semester
+                 updateRibaSummaryTable(); // Update the summary table
+             }
+         }
+     }
+
+
+    // --- Save Data Functionality ---
+    function saveData() {
+        const data = {
+            semesters: {},
+            summaries: {},
+            generalNotes: document.getElementById('general-notes-area').value.trim() // Use .value for textarea
+        };
+
+        semesterIds.forEach(semId => {
+            const tableId = `${semId}-table`;
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const tbody = table.getElementsByTagName('tbody')[0];
+            // Select rows that are not the total row
+            const rows = tbody.querySelectorAll('tr:not(.total-credits-row)');
+            const semesterData = [];
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                // We expect 12 cells (11 data + 1 delete button)
+                if (cells.length < 12) {
+                     console.warn(`Skipping row in ${tableId} with unexpected number of cells (${cells.length}):`, row);
+                     return;
+                }
+
+                // Capture data from the first 11 cells (indices 0-10)
+                const course = {
+                    code: cells[0].textContent.trim(), // Text field
+                    title: cells[1].textContent.trim(), // Text field
+                    credits: cells[2].textContent.trim(), // Text field (will be parsed to int on load)
+                    defaultRibaTheme: cells[3].querySelector('select.riba-select')?.value || "", // Select value
+                    acadRibaDirect: cells[4].querySelector('select.riba-select')?.value || "", // Select value
+                    academicNotes: cells[5].innerHTML.trim(), // innerHTML for multi-line notes
+                    ethicsRibaDirect: cells[6].querySelector('select.riba-select')?.value || "", // Select value
+                    ethicsNotes: cells[7].innerHTML.trim(), // innerHTML for multi-line notes
+                    techRibaDirect: cells[8].querySelector('select.riba-select')?.value || "",  // Select value
+                    techNotes: cells[9].innerHTML.trim(), // innerHTML for multi-line notes
+                    remarks: cells[10].innerHTML.trim() // innerHTML for multi-line remarks
+                };
+                semesterData.push(course);
+            });
+            data.semesters[semId] = semesterData;
+
+            // Save Summary Data
+            const summaryElement = document.getElementById(`${semId}-summary`);
+            if (summaryElement) {
+                data.summaries[semId] = summaryElement.innerHTML.trim(); // Use innerHTML for summary
+            }
+        });
+
+        try {
+            localStorage.setItem(localStorageKey, JSON.stringify(data));
+            showSaveNotification("Planner saved successfully!");
+            // console.log("Data saved:", data);
+        } catch (error) {
+            console.error("Error saving data to localStorage:", error);
+            // Check if error is quota exceeded
+            if (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                 showSaveNotification("Error saving data: Storage is full. Clear space or reduce content.", true);
+            } else {
+                 showSaveNotification("Error saving data: " + error.message, true);
+            }
+        }
+    }
+
+     // --- Show Save Notification ---
+     function showSaveNotification(message, isError = false) {
+         const notification = document.getElementById('save-notification');
+         if (!notification) return;
+
+         notification.textContent = message;
+         notification.classList.toggle('error', isError); // Add/remove error class
+
+         // Force reflow to restart animation if already visible
+         notification.classList.remove('show');
+         void notification.offsetWidth; // Trigger reflow
+         notification.classList.add('show');
+
+         // Hide after 3 seconds
+         if (notification._timer) clearTimeout(notification._timer);
+         notification._timer = setTimeout(() => {
+             notification.classList.remove('show');
+         }, 3000);
+     }
+
+
+    // --- Load Data Functionality ---
+    function loadData() {
+        const savedDataString = localStorage.getItem(localStorageKey);
+        let dataLoadedSuccessfully = false;
+        if (savedDataString) {
+             try {
+                const savedData = JSON.parse(savedDataString);
+                document.getElementById('general-notes-area').value = savedData.generalNotes || "";
+
+                let semesterDataFound = false;
+                 semesterIds.forEach(semId => {
+                    const tableId = `${semId}-table`;
+                    const table = document.getElementById(tableId);
+
+                    if (table) {
+                         const tbody = table.getElementsByTagName('tbody')[0];
+                         // Remove all existing data rows (keep header and total row if they exist in HTML)
+                         const existingRows = tbody.querySelectorAll('tr:not(.total-credits-row)');
+                         existingRows.forEach(row => row.remove());
+
+                         if (savedData.semesters && savedData.semesters[semId] && savedData.semesters[semId].length > 0) {
+                             savedData.semesters[semId].forEach(course => {
+                                 addCourseRevised(tableId, course); // addCourseRevised calculates credits and unused RIBA and updates summary
+                             });
+                             semesterDataFound = true;
+                         } else {
+                              // If no saved data for this table, ensure default HTML rows are present
+                              // (This is handled by the static HTML structure) and initialize their selects.
+                              // Need to initialize selects on the *default* rows that weren't removed
+                              table.querySelectorAll('tbody tr:not(.total-credits-row) select.riba-select').forEach(select => {
+                                  populateRibaSelect(select, select.getAttribute('value') || select.value); // Use value from HTML
+                                   select.removeAttribute('value'); // Clean up attribute
+                              });
+                             // Also calculate unused RIBA for this potentially empty or default table
+                             calculateUnusedRiba(tableId);
+                              // And update the summary table based on current (default/empty) data
+                              updateRibaSummaryTable(); // Call here if semester wasn't populated from saved data
+                         }
+
+                         // Load Summary Data
+                         const summaryElement = document.getElementById(`${semId}-summary`);
+                         if (summaryElement && savedData.summaries && savedData.summaries[semId] !== undefined) {
+                             summaryElement.innerHTML = savedData.summaries[semId]; // Use innerHTML for summary
+                         }
+                    }
+                });
+
+                // console.log("Data load attempt finished.");
+                // Consider load successful if JSON parsed AND there was semester data or summary/general notes
+                if (semesterDataFound || (savedData.generalNotes !== undefined && savedData.generalNotes !== "") || (savedData.summaries && Object.keys(savedData.summaries).length > 0)) {
+                    dataLoadedSuccessfully = true;
+                } else {
+                    // console.log("No significant saved data found, using default HTML or empty tables.");
+                }
+
+
+            } catch (error) {
+                console.error("Error parsing data from localStorage:", error);
+                if (savedDataString) { // Only show error if there was saved data
+                     showSaveNotification("Error loading saved data. It might be corrupted. Using default planner.", true);
+                }
+            }
+        }
+
+        if (!dataLoadedSuccessfully) {
+             // console.log("No valid saved data found. Ensuring default view is correctly initialized and calculating initial unused RIBA.");
+             // Ensure all default dropdowns are populated if no data loaded successfully
+             initializeRibaDropdowns(); // This should handle the default rows present in the HTML
+             calculateAllSemestersUnusedRiba(); // Calculate for all semesters if no data loaded
+             updateRibaSummaryTable(); // Update the summary table based on default data
+        }
+
+        // Always calculate credits after loading or initializing
+        calculateAllSemestersCredits();
+        // Unused RIBA calculation and Summary table update are handled within loadData/addCourseRevised/handleDeleteRow/handleRibaSelectChange now.
+    }
+
+    // --- Initial Setup & Event Delegation ---
+    document.addEventListener('DOMContentLoaded', () => {
+        loadData(); // Load data, which also initializes dropdowns and calculates initial values
+
+        // Add event delegation for interactive elements within the planner
+        const plannerDiv = document.querySelector('.curriculum-planner');
+        if(plannerDiv) {
+            // Use event delegation on the main planner div
+            plannerDiv.addEventListener('click', function(event) {
+                // Delete button clicks
+                if (event.target.classList.contains('delete-row-button') || event.target.parentElement.classList.contains('delete-row-button')) {
+                     // Ensure we get the button element even if the icon inside is clicked
+                    const button = event.target.closest('.delete-row-button');
+                    if(button) handleDeleteRow({ target: button }); // Pass the button as target
+                }
+            });
+
+            // Add event delegation for input changes (specifically credits and other editable cells)
+             plannerDiv.addEventListener('input', function(event) {
+                 const target = event.target;
+                 // Check if the input is in a credit cell using the data attribute
+                 if (target.tagName === 'TD' && target.isContentEditable && target.getAttribute('data-cell-type') === 'credits')
+                 {
+                      handleCreditInput(event); // This function handles calculation and sanitation
+                 }
+                  else if (target.isContentEditable || target.tagName === 'TEXTAREA') {
+                     // Input in other editable cells or textarea
+                     // Optional: Debounce auto-save for other editable areas
+                     // debounceSave(); // Uncomment if you add debounceSave
+                  }
+             });
+
+             // Add event delegation for select changes (RIBA dropdowns)
+             plannerDiv.addEventListener('change', handleRibaSelectChange); // Call handler for RIBA select changes
+
+              // Add input listener for summary paragraphs (delegated)
+             plannerDiv.addEventListener('input', function(event) {
+                 if (event.target.classList.contains('semester-summary')) {
+                     // console.log("Summary changed");
+                     // Trigger debounced save here?
+                 }
+             });
+        }
+
+         // Initial calculation for default rows if no data was loaded
+         // This is handled within the loadData function now.
+    });
+
+    // Expose functions globally so HTML buttons work
+    window.addCourse = addCourseRevised;
+    window.saveData = saveData; // Ensure saveData is also global
+
+    // Optional: Debounce utility function (can be used for auto-saving)
+    /*
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+    const debounceSave = debounce(saveData, 2000); // Auto-save after 2 seconds of inactivity
+    */
+
+    /* --- End of Refined JavaScript v7 (5yr with RIBA Summary Table) --- */
+</script>
+
+</body>
+</html>
