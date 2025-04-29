@@ -390,9 +390,9 @@
              text-align: center;
              margin-top: 10px;
              font-size: 0.9em;
-             color: var(--dark-grey);
              min-height: 1.2em; /* Reserve space */
              /* Use JS to set color based on state */
+             color: var(--dark-grey); /* Default color */
         }
          .google-drive-status.unsaved {
              color: var(--unsaved-color);
@@ -1532,7 +1532,7 @@
 </div><!-- /.curriculum-planner -->
 
 <script>
-    /* --- Start of Refined JavaScript v11 (Fixes ReferenceError, SyntaxError, Dropdowns) --- */
+    /* --- Start of Refined JavaScript v12 (Auto Load from Drive on Sign-in/Ready) --- */
     const ribaThemes = [
         "Health & Life Safety", "Ethics", "Professional Practice", "Structures",
         "Construction", "Resources", "History", "Theory & Methodologies",
@@ -1540,7 +1540,7 @@
         "Climate Literacy", "Research Literacy"
     ];
      // Updated Key for this version
-    const localStorageKey = 'bArchCurriculumData_Nitte_V11yr_RIBA_GD'; // Version 11 key for localStorage fallback
+    const localStorageKey = 'bArchCurriculumData_Nitte_V12yr_RIBA_GD'; // Version 12 key for localStorage fallback
 
      // Array of semester IDs for easier looping
     const semesterIds = ['sem1', 'sem2', 'sem3', 'sem4', 'sem5', 'sem6', 'sem7', 'sem8', 'sem9', 'sem10'];
@@ -1556,7 +1556,7 @@
     // --- Google Drive State Variables ---
     let tokenClient; // Google Identity Services client for getting tokens
     let accessToken = null; // Current access token obtained via GSI
-    let plannerFileId = null; // ID of the planner file in Google Drive
+    let plannerFileId = localStorage.getItem(`${localStorageKey}_fileId`) || null; // Initialize from localStorage immediately
     let isApiLoaded = false; // Flag to track if the GAPI client and Drive API are loaded
 
     // --- Autosave Variables ---
@@ -1567,7 +1567,7 @@
     const signInButton = document.getElementById('sign-in-button');
     const signOutButton = document.getElementById('sign-out-button');
     const saveToDriveButton = document.getElementById('save-to-drive-button');
-    const loadFromDriveButton = document.getElementById('load-from-drive-button');
+    const loadFromDriveButton = document.getElementById('load-from-drive-button'); // Still exists but will be hidden/disabled with auto-load
     const driveStatusElement = document.getElementById('google-drive-status');
     const notificationElement = document.getElementById('save-notification'); // Use the existing notification
     const plannerDiv = document.querySelector('.curriculum-planner'); // Get the main container for delegation
@@ -1580,7 +1580,7 @@
         // Remove all specific color classes
         driveStatusElement.classList.remove('error', 'success', 'unsaved');
         // Add the appropriate class based on type
-        if (type && type !== 'info') { // 'info' uses the default color
+        if (type && type !== 'info') { // 'info' uses the default color from CSS
             driveStatusElement.classList.add(type);
         }
         console.log(`[Drive Status] ${message} (Type: ${type})`); // Keep console log for debugging
@@ -1620,7 +1620,8 @@
             prompt: '', // Request permissions explicitly when calling requestAccessToken
         });
          console.log("GIS client initialized.");
-         // Initial status update will happen after GAPI loads as well in onApiLoadComplete
+         // This does NOT mean the user is signed in yet. It means the auth library is ready.
+         // Check for sign-in status and trigger load happens later in checkAndLoadFromDrive.
     }
 
     // Dedicated callback for the GSI token client (called by gisLoaded or tokenClient.requestAccessToken)
@@ -1643,10 +1644,9 @@
              }
              setDriveStatus(statusMessage, statusType);
 
-
             accessToken = null;
             gapi.client.setToken(null); // Ensure gapi client token is cleared
-            updateSignInStatus(); // Update buttons and final status message
+            updateSignInStatus(); // Update buttons
             cancelScheduledAutosave(); // Cancel any pending autosave if auth fails
             return;
         }
@@ -1656,23 +1656,9 @@
         gapi.client.setToken({ access_token: accessToken }); // Set the token for gapi.client
         console.log("Successfully signed in. Access Token obtained."); // Debug log
 
-        // Status will be updated to success/searching by onApiLoadComplete or findOrCreatePlannerFile
-        updateSignInStatus(); // Update buttons immediately
+        updateSignInStatus(); // Update buttons
+        checkAndLoadFromDrive(); // Check if we can now load from Drive
 
-        // If the API is already loaded, we can proactively find/create the file ID
-        // Otherwise, the check will run later when onApiLoadComplete fires.
-        if (isApiLoaded && !plannerFileId) {
-            console.log("Signed in and API loaded, but file ID unknown. Searching/creating file..."); // Debug log
-            // Don't await here, let it run in the background or chain Promises if needed
-             findOrCreatePlannerFile().catch(err => {
-                 console.error("Error finding/creating file after sign-in:", err);
-                 // Status/notification already handled by findOrCreatePlannerFile
-             });
-        } else if (isApiLoaded && plannerFileId) {
-             // If already signed in and file ID known, just update status to confirm readiness
-             setDriveStatus("Signed in. Planner file ready.", 'success');
-        }
-        // If API is not yet loaded, the find/create will happen later in onApiLoadComplete if signed in.
         console.log("handleGsiCallback finished.");
     }
 
@@ -1699,8 +1685,8 @@
                  console.log("Google Drive API v3 loaded successfully."); // Debug log
                  isApiLoaded = true; // Set the flag
 
-                 // Now that both client and Drive API are loaded:
-                 onApiLoadComplete(); // Call the function to handle post-load setup
+                 setupButtonListeners(); // Setup listeners for Google Drive buttons now that GAPI is loaded
+                 checkAndLoadFromDrive(); // Check if we can now load from Drive
 
              })
             .catch((error) => {
@@ -1712,37 +1698,51 @@
             });
     }
 
-    // Actions to perform once GSI token client is ready AND GAPI client + Drive API are loaded
-    function onApiLoadComplete() {
-         console.log("onApiLoadComplete called. Setting up..."); // Debug log
-        // Setup listeners for Google Drive buttons now that GAPI is loaded
-        setupButtonListeners();
+    /**
+     * Checks if both API is loaded and user is signed in, then attempts to load data from Drive.
+     * This is the central function called after potential state changes (API load, sign-in).
+     */
+    async function checkAndLoadFromDrive() {
+         console.log(`checkAndLoadFromDrive called. State: SignedIn=${!!accessToken}, ApiLoaded=${isApiLoaded}, FileIdKnown=${!!plannerFileId}`); // Debug log
 
-        // Attempt to load file ID from localStorage
-        plannerFileId = localStorage.getItem(`${localStorageKey}_fileId`);
-        console.log("Initial plannerFileId check from localStorage (onApiLoadComplete):", plannerFileId); // Debug log
-
-        // Update buttons based on current sign-in state (if any) and API loaded status
-        updateSignInStatus();
-
-        // If already signed in (e.g., page reload after auth), and API is loaded but file ID unknown, find/create it now
-         if (accessToken && isApiLoaded && !plannerFileId) {
-             console.log("API loaded, signed in, but file ID unknown. Searching/creating file..."); // Debug log
-             // Don't await here, let it run in the background or chain Promises if needed
-             findOrCreatePlannerFile().catch(err => {
-                  console.error("Error finding/creating file after API load:", err);
-                  // Status/notification already handled by findOrCreatePlannerFile
-             });
-         } else if (accessToken && isApiLoaded && plannerFileId) {
-              // If already signed in and file ID known, just update status to confirm readiness
-              setDriveStatus("Signed in. Planner file ready.", 'success');
-         } else if (isApiLoaded) {
-             // Not signed in, API is loaded. Prompt user to sign in.
-             setDriveStatus("Google Drive ready. Sign in to load/save.", 'info');
+         if (!accessToken || !isApiLoaded) {
+             console.log("Check failed: Not signed in or API not loaded.");
+             updateSignInStatus(); // Ensure buttons/status reflect current state
+             return; // Cannot load yet
          }
-         // else { // !isApiLoaded, status remains "Loading Google API..." from initialLoad
-         // }
-         console.log("onApiLoadComplete finished."); // Debug log
+
+         if (!plannerFileId) {
+             // We are signed in and API is loaded, but we don't know the file ID yet.
+             // Attempt to find or create it first.
+             setDriveStatus("Signed in. Searching for planner file...", 'info');
+             try {
+                 plannerFileId = await findOrCreatePlannerFile(); // This will update plannerFileId and local storage
+                  if (!plannerFileId) {
+                       // If findOrCreate failed to return an ID, an error status is already set.
+                       console.error("checkAndLoadFromDrive failed: Could not find or create file ID.");
+                       updateSignInStatus(); // Ensure status reflects failure
+                       return;
+                  }
+                  console.log("File ID established:", plannerFileId); // Debug log
+                  // Status updated by findOrCreateFile.
+             } catch (error) {
+                 // Error handled and status set by findOrCreatePlannerFile, just exit
+                 console.error("checkAndLoadFromDrive failed during findOrCreatePlannerFile:", error);
+                 updateSignInStatus(); // Ensure status reflects failure
+                 return;
+             }
+         }
+
+         // If we reach here, we are signed in, API is loaded, and plannerFileId is known.
+         console.log("All conditions met for automatic load. Attempting to load from Drive...");
+         // Now we can attempt the load. loadDataFromDrive handles the actual fetch and data application.
+         // Do *not* await this, let the load happen in the background.
+         loadDataFromDrive().catch(err => {
+              console.error("Automatic load from Drive failed:", err);
+              // Errors handled and status set by loadDataFromDrive
+         });
+
+         // status will be updated by loadDataFromDrive success/failure
     }
 
 
@@ -1796,63 +1796,57 @@
 
         // Enable Save/Load buttons only when signed in AND API is loaded
         saveToDriveButton.disabled = !(signedIn && apiReady);
+        // The Load button will typically be hidden with automatic loading, but ensure it's disabled if visible but not ready
         loadFromDriveButton.disabled = !(signedIn && apiReady);
+
         // Hide buttons until API is loaded, regardless of sign-in state
         saveToDriveButton.hidden = !apiReady;
-        loadFromDriveButton.hidden = !apiReady;
-
+        // Hide the manual load button entirely if signed in and API ready, because load is automatic
+        loadFromDriveButton.hidden = !apiReady || signedIn;
 
         // Update the status message, unless it's currently showing "Unsaved changes..."
         // This prevents the autosave status from being overwritten prematurely.
-        if (!saveTimerId) { // Only update status if no autosave is pending
+        // Also, don't update if a load/save is explicitly in progress (status is "Loading..." or "Saving...")
+         const currentStatusText = driveStatusElement.textContent;
+        if (!saveTimerId && currentStatusText !== "Loading..." && currentStatusText !== "Saving...") {
              if (!apiReady) {
                  setDriveStatus("Loading Google API...");
              } else if (!signedIn) {
                  setDriveStatus("Google Drive ready. Sign in to load/save.", 'info');
              } else if (!plannerFileId) {
-                  // Signed in, API loaded, but file ID unknown (should be resolved by findOrCreate after sign-in/load)
+                  // Signed in, API loaded, but file ID unknown (this state should lead to checkAndLoadFromDrive trying to find it)
                   setDriveStatus("Signed in. Searching for planner file...", 'info');
              } else {
-                 // Signed in, API loaded, File ID known
+                 // Signed in, API loaded, File ID known, and no pending save/load
                  setDriveStatus("Planner file ready.", 'success'); // Could refine this based on last save time?
              }
         }
-         // Else: status remains "Unsaved changes..." set by scheduleAutosave
+         // Else: status remains "Unsaved changes...", "Loading...", or "Saving..."
 
-         console.log(`Update Sign In Status: SignedIn=${signedIn}, ApiReady=${apiReady}, FileIdPresent=${!!plannerFileId}, SavePending=${!!saveTimerId}`); // Debug log
+         console.log(`Update Sign In Status: SignedIn=${signedIn}, ApiReady=${isApiLoaded}, FileIdPresent=${!!plannerFileId}, SavePending=${!!saveTimerId}`); // Debug log
     }
 
-     // --- Google Drive File Management Functions ---
-
-    /**
-     * Searches for the planner file by name. If not found, creates it.
-     * Stores the file ID in plannerFileId and localStorage.
-     * Returns a Promise that resolves with the file ID.
-     */
+     /**
+      * Searches for the planner file by name. If not found, creates it.
+      * Stores the file ID in plannerFileId and localStorage.
+      * Returns a Promise that resolves with the file ID (string) or null if not signed in/api not ready.
+      * Throws an error if signed in/ready but API call fails.
+      */
     async function findOrCreatePlannerFile() {
         console.log("findOrCreatePlannerFile called."); // Debug log
         if (plannerFileId) {
             console.log("File ID already known:", plannerFileId); // Debug log
-            // Update status to success only if not already showing "Unsaved changes..."
-            if (!saveTimerId) {
-                 setDriveStatus("Planner file ready.", 'success');
-            }
+            // Status will be updated by the caller (checkAndLoadFromDrive or saveDataToDrive)
             return plannerFileId; // Use cached ID
         }
 
-        if (!accessToken) {
-            console.warn("findOrCreatePlannerFile: Not signed in. Cannot find or create file."); // Debug log
-             setDriveStatus("Cannot find/create file: Not signed in.", 'info');
-             updateSignInStatus(); // Revert status to 'Sign in...'
-             return null; // Return null when not signed in
-        }
-        if (!isApiLoaded || !gapi?.client?.drive) {
-             console.error("findOrCreatePlannerFile: GAPI Drive client not ready."); // Debug log
-            setDriveStatus("Cannot find/create file: Google Drive API not loaded.", 'error');
-            throw new Error("Google Drive API client not initialized."); // Should be caught by outer checks
+        if (!accessToken || !isApiLoaded || !gapi?.client?.drive) {
+            console.warn("findOrCreatePlannerFile: Prerequisites not met (signed in, API loaded). Cannot find or create file."); // Debug log
+            // Status should already reflect not signed in or API not loaded.
+             return null; // Return null when prerequisites are not met
         }
 
-        setDriveStatus(`Searching for "${PLANNER_FILE_NAME}"...`, 'info');
+        // Status update handled by caller before calling this function
 
         try {
             // Search for the file by name and MIME type
@@ -1869,18 +1863,11 @@
                 // File found
                 plannerFileId = files[0].id;
                 localStorage.setItem(`${localStorageKey}_fileId`, plannerFileId);
-                // Only update status to success if not currently showing "Unsaved changes..."
-                if (!saveTimerId) {
-                     setDriveStatus(`Found planner file: "${files[0].name}".`, 'success');
-                } else {
-                     // If unsaved changes are pending, keep that status
-                     setDriveStatus("Unsaved changes...", 'unsaved');
-                }
                 console.log("Found existing planner file:", plannerFileId); // Debug log
+                // Status updated by caller
                 return plannerFileId;
             } else {
                 // File not found, create it
-                setDriveStatus(`"${PLANNER_FILE_NAME}" not found. Creating new file...`, 'info');
                  console.log("File not found. Attempting to create."); // Debug log
                 const createResponse = await gapi.client.drive.files.create({
                     resource: {
@@ -1892,38 +1879,30 @@
 
                 plannerFileId = createResponse.result.id;
                 localStorage.setItem(`${localStorageKey}_fileId`, plannerFileId);
-                // Status update after creation - might be unsaved state if autosave triggered creation
-                 if (!saveTimerId) {
-                     setDriveStatus(`Created new planner file: "${createResponse.result.name}".`, 'success');
-                 } else {
-                     setDriveStatus("Unsaved changes...", 'unsaved');
-                 }
-
                 console.log("Created new planner file:", plannerFileId); // Debug log
+                 // Status updated by caller
                 return plannerFileId;
             }
         } catch (error) {
             console.error("Error finding or creating file:", error); // Debug log
             const errorMessage = error.result?.error?.message || error.body?.error?.message || error.message || "Unknown error";
-             setDriveStatus(`Error finding/creating file: ${errorMessage}`, 'error');
-            updateSignInStatus(); // Ensure buttons/status reflect failure
-            // Decide whether to throw or return null. Throwing might be better for callers expecting an ID on success.
+            // Status updated by caller
             throw new Error(`Could not find or create planner file: ${errorMessage}`); // Propagate error
         }
-        // No finally block needed here, status is set inside try/catch
     }
 
      /**
       * Saves the current planner data to the file in Google Drive.
       * This function is called by manual save or the autosave timer.
+      * Requires accessToken, isApiLoaded, and plannerFileId to be set *before* calling.
       */
     async function saveDataToDrive() {
         console.log("saveDataToDrive called."); // Debug log
         cancelScheduledAutosave(); // Ensure any pending autosave is cleared before *this* save starts
 
-        if (!accessToken || !isApiLoaded) {
-             console.warn("Save attempted when not signed in or API not loaded.");
-             setDriveStatus("Cannot save: Not signed in or Google Drive not ready.", 'info');
+        if (!accessToken || !isApiLoaded || !plannerFileId) {
+             console.warn("Save attempted when prerequisites not met (signed in, API loaded, file ID known).");
+             setDriveStatus("Cannot save: Prerequisites not met.", 'info');
             return; // Stop execution
         }
 
@@ -1932,14 +1911,7 @@
         showNotification("Saving to Google Drive...", false, true); // Info notification
 
         try {
-            // findOrCreatePlannerFile also checks accessToken/isApiLoaded internally
-            const fileId = await findOrCreatePlannerFile(); // Ensure file exists and ID is known
-             if (!fileId) {
-                  // findOrCreatePlannerFile should have set an error status, just exit
-                  console.error("Save failed: File ID not available after findOrCreateFile.");
-                 throw new Error("File ID not available for saving.");
-             }
-              console.log("Saving data to file ID:", fileId); // Debug log
+             console.log("Saving data to file ID:", plannerFileId); // Debug log
 
             const data = collectPlannerData(); // Collect data from the page
             const jsonContent = JSON.stringify(data, null, 2); // Stringify with formatting
@@ -1963,7 +1935,7 @@
 
              console.log("Sending PATCH request to Drive API..."); // Debug log
             const response = await gapi.client.request({
-                path: '/upload/drive/v3/files/' + fileId,
+                path: '/upload/drive/v3/files/' + plannerFileId, // Use known fileId
                 method: 'PATCH',
                 params: {
                     uploadType: 'multipart' // Indicate multipart upload
@@ -1988,7 +1960,7 @@
              // If the error is authentication related, prompt sign-in
              if (error.status === 401 || error.status === 403) { // Unauthorized or Forbidden
                   setDriveStatus("Authentication required or expired. Please sign in again.", 'info');
-                  // Potentially auto-trigger sign-in here if this was an autosave attempt?
+                  // Auto-trigger sign-in here if it was an autosave attempt?
                   // handleAuthClick(); // Maybe too aggressive for autosave failure
              }
         } finally {
@@ -1999,38 +1971,27 @@
 
      /**
       * Loads planner data from the file in Google Drive.
+      * This function is called automatically by checkAndLoadFromDrive.
+      * Requires accessToken, isApiLoaded, and plannerFileId to be set *before* calling.
       */
     async function loadDataFromDrive() {
         console.log("loadDataFromDrive called."); // Debug log
-        if (!accessToken) {
-            showNotification("Please sign in to Google Drive first.", false, true); // Info, not error
-            handleAuthClick(); // Prompt sign-in
-            return; // Stop execution until signed in
-        }
-         if (!isApiLoaded) {
-             showNotification("Google Drive API is not loaded yet.", false, true); // Info
-             setDriveStatus("Please wait for Google Drive to load.", 'info');
-             return;
-         }
+        // Prerequisites (accessToken, isApiLoaded, plannerFileId) checked by checkAndLoadFromDrive
 
          showNotification("Loading from Google Drive...", false, true); // Info notification
          setDriveStatus("Loading...", 'info');
-         loadFromDriveButton.disabled = true; // Disable button during load
+         // loadFromDriveButton.disabled = true; // No need to disable manual button if it's hidden/disabled
          cancelScheduledAutosave(); // Cancel any pending autosave before loading
 
 
         try {
-            const fileId = await findOrCreatePlannerFile(); // Ensure file exists and ID is known
-             if (!fileId) {
-                  console.error("Load failed: File ID not available after findOrCreateFile.");
-                 throw new Error("File ID not available for loading.");
-             }
-              console.log("Loading data from file ID:", fileId); // Debug log
+             // fileId is guaranteed to be known if checkAndLoadFromDrive reaches this point
+              console.log("Loading data from file ID:", plannerFileId); // Debug log
 
             // Get file content using alt=media parameter
             console.log("Sending GET request to Drive API for file content..."); // Debug log
             const response = await gapi.client.drive.files.get({
-                fileId: fileId,
+                fileId: plannerFileId, // Use known fileId
                 alt: 'media' // Specify that we want the file content
             });
 
@@ -2039,7 +2000,7 @@
             console.log("Load successful:", loadedData); // Debug log
 
             // Apply the loaded data to the page
-            applyPlannerData(loadedData);
+            applyPlannerData(loadedData); // This handles clearing existing UI and populating
 
              showNotification("Planner loaded from Google Drive!", false); // Success notification
              setDriveStatus("Loaded successfully.", 'success');
@@ -2054,8 +2015,8 @@
                   setDriveStatus("Authentication required or expired. Please sign in again.", 'info');
              }
         } finally {
-             loadFromDriveButton.disabled = false; // Re-enable button
-             updateSignInStatus(); // Ensure buttons are correctly enabled/disabled
+             // loadFromDriveButton.disabled = false; // Re-enable button - handled by updateSignInStatus
+             updateSignInStatus(); // Ensure buttons are correctly enabled/disabled after load attempt
              console.log("loadDataFromDrive finished.");
              // No autosave needed immediately after loading - user hasn't made changes yet.
         }
@@ -2066,10 +2027,10 @@
 
  // Collects all data from the HTML planner into a JSON object
  function collectPlannerData() {
-    console.log("collectPlannerData called."); // Debug log
+    // console.log("collectPlannerData called."); // Debug log
     const data = {
         // Use a version flag in data for potential future format changes
-        version: 11, // Increment version
+        version: 12, // Increment version
         semesters: {},
         summaries: {},
         generalNotes: document.getElementById('general-notes-area')?.value ?? "" // Use .value for textarea, handle null element
@@ -2128,70 +2089,33 @@
     return data;
  }
 
- // Applies loaded data to the HTML planner
- // forceDefault = true can be used to re-initialize the UI to its default HTML state.
- function applyPlannerData(data, forceDefault = false) {
-    console.log(`Applying Planner Data (forceDefault: ${forceDefault}):`, data); // Debug log
+ // Applies loaded data to the HTML planner.
+ // This function is responsible for clearing the existing *dynamic* UI elements
+ // and populating the UI with the provided data.
+ function applyPlannerData(data) {
+    console.log("Applying Planner Data:", data); // Debug log
 
-    if (!data || typeof data !== 'object' || forceDefault) {
-        if (!forceDefault) console.warn("No valid data provided to apply, or forceDefault is true. Initializing default HTML structure.");
-        // If no data or forced default, clear current content and re-initialize default UI.
-        // Clearing content might be tricky if we want to preserve the original HTML structure.
-        // A better approach is to clear dynamically added rows and then re-initialize based on current DOM.
-
-        // Reset general notes to empty or default
-        const generalNotesArea = document.getElementById('general-notes-area');
-        if(generalNotesArea) generalNotesArea.value = "";
-
-        // Clear dynamic rows and summaries, then re-initialize everything below
-        semesterIds.forEach(semId => {
-            const table = document.getElementById(`${semId}-table`);
-            const summaryElement = document.getElementById(`${semId}-summary`);
-
-            if (table) {
-                const tbody = table.getElementsByTagName('tbody')[0];
-                if(tbody) {
-                     // Remove ALL rows except the header and total row
-                     // Find default rows to keep them? Or assume all rows in tbody *except* total are data rows?
-                     // Let's assume any row that isn't total-credits-row should be cleared if loading from file.
-                     // If forceDefault=true, we want to keep the original HTML rows. This function needs adjustment.
-
-                     // Okay, rethinking: applyPlannerData should only *add* rows from loaded data.
-                     // The *calling* code (initialLoad) should handle clearing the existing rows
-                     // based on whether it successfully loaded data or is falling back to default HTML.
-                     // Let's revert applyPlannerData to *only* add rows and summaries.
-                     // And modify initialLoad to clear *before* calling applyPlannerData if data IS loaded.
-                }
-            }
-             // If summary was editable, clear its content if needed?
-             // if (summaryElement) summaryElement.innerHTML = ""; // Or revert to original default text?
-        });
-
-        // If we were meant to load data but failed, we now have the default HTML structure.
-        // We still need to initialize selects and run calculations for this structure.
-        initializeAllRibaDropdowns();
-        calculateAllSemestersCredits();
-        calculateAllSemestersUnusedRiba();
-        updateRibaSummaryTable();
-
-        console.log("Apply data finished. UI initialized/reset.");
-        return; // Stop here if no valid data or forced default
+    // Check for valid data structure
+    if (!data || typeof data !== 'object' || !data.semesters || data.summaries === undefined || data.generalNotes === undefined) {
+        console.warn("Invalid data structure provided to applyPlannerData. Cannot apply.", data);
+        showNotification("Loaded data is invalid or corrupted. Cannot apply.", true);
+        // Do NOT revert to default here. The initialLoad handles the default fallback if load fails.
+        // Just ensure UI reflects current state (likely the localStorage/default state if Drive load failed).
+        // The UI state before this failed apply would have been set by initialLoad.
+        // Re-running calculations for the current state might be wise, but it's complex.
+        // Let's assume the initialLoad state is preserved if apply fails.
+        return;
     }
 
-    // --- Logic for applying VALID loaded data ---
-    console.log("Applying loaded data...");
 
     // Apply general notes
     const generalNotesArea = document.getElementById('general-notes-area');
-    if (generalNotesArea && data.generalNotes !== undefined) { // Check specifically for undefined to allow empty string
-        generalNotesArea.value = data.generalNotes;
-    } else if (generalNotesArea) {
-         generalNotesArea.value = ""; // Clear if data is missing notes property
-         console.warn("General notes data missing or undefined in loaded data.");
+    if (generalNotesArea) { // Element might be missing in very minimal HTML
+         generalNotesArea.value = data.generalNotes ?? ""; // Use ?? "" to ensure it's a string
     }
 
 
-    // Apply semester data
+    // Apply semester data and summaries
     semesterIds.forEach(semId => {
         const tableId = `${semId}-table`;
         const table = document.getElementById(tableId);
@@ -2209,8 +2133,7 @@
          }
 
         // CLEAR existing data rows before adding loaded data rows
-         // Assume any row that is NOT the total-credits-row AND is NOT a header row (tbody has no headers)
-         // is a data row that should be replaced by the loaded data.
+         // Assume any row that is NOT the total-credits-row is a dynamic data row that should be replaced.
          const existingRows = tbody.querySelectorAll('tr:not(.total-credits-row)');
          existingRows.forEach(row => row.remove());
          console.log(`Cleared existing rows for ${tableId} before applying loaded data.`); // Debug log
@@ -2223,16 +2146,17 @@
                  addCourseRowToTable(tableId, course); // Use the row adding helper
              });
         } else {
-            console.warn(`No course data found for ${semId} in the loaded data. Semester will be empty.`); // Debug log
+            console.warn(`No course data array found for ${semId} in the loaded data. Semester will be empty.`); // Debug log
         }
 
         // Apply Summary Data (innerHTML)
         if (summaryElement && data.summaries && data.summaries[semId] !== undefined) { // Check for undefined
-             summaryElement.innerHTML = data.summaries[semId];
+             summaryElement.innerHTML = data.summaries[semId] ?? ''; // Use ?? '' to ensure string
              // console.log(`Applied summary for ${semId}.`); // Debug log
         } else if (summaryElement) {
-             console.warn(`No summary data found for ${semId} or data missing in loaded data. Keeping default HTML summary.`); // Debug log
+             console.warn(`No summary data found for ${semId} or data missing in loaded data. Leaving current HTML summary.`); // Debug log
              // If no summary data in the file, the original HTML summary remains from initial DOM load.
+             // If you want to explicitly clear it if absent: summaryElement.innerHTML = '';
         }
     });
 
@@ -2240,7 +2164,7 @@
      console.log("Applying data complete. Recalculating totals, unused, and summary."); // Debug log
      // These functions will operate on the DOM state *after* data is applied,
      // handling either loaded rows or an empty state if no data was loaded for a semester.
-     initializeAllRibaDropdowns(); // Re-populate ALL selects (loaded rows + default HTML rows if any weren't cleared - though they should be)
+     initializeAllRibaDropdowns(); // Re-populate ALL selects on the page
      calculateAllSemestersCredits();
      calculateAllSemestersUnusedRiba(); // This calls calculateUnusedRiba for each sem
      updateRibaSummaryTable(); // This rebuilds the summary table
@@ -2298,7 +2222,7 @@ function populateRibaSelect(selectElement, selectedValue = "") {
     const allSelects = document.querySelectorAll('select.riba-select');
     console.log(`Found ${allSelects.length} RIBA dropdowns to initialize.`); // Debug log
     allSelects.forEach(select => {
-        // The value attribute might have been set by addCourseRowToTable
+        // The value attribute might have been set by addCourseRowToTable when applying data
         // The .value property might reflect the current state if it was an existing HTML element
         // Prioritize the 'value' attribute if it exists, otherwise use the .value property
         const initialValue = select.getAttribute('value') ?? select.value ?? "";
@@ -2629,12 +2553,12 @@ function addCourseRowToTable(tableId, courseData = null) {
 
 // --- Autosave Logic ---
 
-// Schedules the autosave timer if signed in and API is ready and file ID is known.
+// Schedules the autosave timer if signed in, API is ready, and file ID is known.
 // Clears any previous timer.
 function scheduleAutosave() {
      // console.log("scheduleAutosave called."); // Debug log
      // Only schedule autosave if signed in AND API is ready AND a file ID is known
-     // (Cannot save if file ID is not established yet, findOrCreate happens during first save/load)
+     // (Cannot save if file ID is not established yet)
      if (!accessToken || !isApiLoaded || !plannerFileId) {
          console.log("Not signed in, API not ready, or file ID unknown. Skipping autosave schedule."); // Debug log
          // No need to set status here, updateSignInStatus handles the not-signed-in/not-ready states
@@ -2657,7 +2581,8 @@ function scheduleAutosave() {
      // console.log(`Autosave scheduled in ${AUTOSAVE_DELAY_MS}ms. Timer ID: ${saveTimerId}`); // Debug log
 
      // Provide quick feedback that autosave is pending, only if not already saving/saved
-      if (driveStatusElement.textContent !== "Saving...") {
+      const currentStatusText = driveStatusElement.textContent;
+      if (currentStatusText !== "Saving..." && currentStatusText !== "Loading...") {
           setDriveStatus("Unsaved changes...", 'unsaved');
       }
 }
@@ -2687,7 +2612,7 @@ function cancelScheduledAutosave() {
       // Use closest for TDs within tables to be more specific.
       if (
           (target.tagName === 'TD' && target.isContentEditable && target.closest('table')) || // Editable TD within a table
-          (target.classList.contains('semester-summary') && target.isContentEditable) || // Editable summary paragraph
+          (target.classList.contains('semester-summary') && target.isContenteditable) || // Editable summary paragraph
           (target.id === 'general-notes-area') // General notes textarea
       ) {
            // console.log(`Input event detected on ${target.tagName} (ID: ${target.id || target.classList[0]}). Scheduling autosave.`); // Debug log
@@ -2715,17 +2640,15 @@ function cancelScheduledAutosave() {
           cell.textContent = sanitizedValue;
            console.log(`Credit value sanitized from "${originalValue}" to "${sanitizedValue}".`);
           // Note: Setting textContent here doesn't trigger another 'input' event.
-          // If the user only blurred after pasting invalid characters (no typing),
-          // the 'input' handler wouldn't have fired.
-          // scheduleAutosave should be called by the handleInputEvent when the user types/pastes.
-          // We don't need to explicitly reschedule *just* because of sanitation on blur.
-          // The autosave timer should already be running from the input event.
+          // scheduleAutosave should be called by the handleInputEvent if the user was typing/pasting.
+          // No need to explicitly reschedule *just* because of sanitation on blur.
       }
 
      const table = cell.closest('table');
      if (table && table.id) {
           // Calculate credits immediately on blur for responsive UI feedback
          calculateSemesterCredits(table.id);
+          // No need to schedule autosave here, it's handled by handleInputEvent
      }
       console.log("Credit cell blur handler finished.");
  }
@@ -2840,6 +2763,7 @@ function setupButtonListeners() {
         signInButton.addEventListener('click', handleAuthClick);
         signOutButton.addEventListener('click', handleSignoutClick);
         saveToDriveButton.addEventListener('click', saveDataToDrive); // Manual save button calls save directly
+        // The manual load button is typically hidden when signed in/ready.
         loadFromDriveButton.addEventListener('click', loadDataFromDrive);
         console.log("Google Drive button listeners attached."); // Debug log
     } else {
@@ -2849,43 +2773,49 @@ function setupButtonListeners() {
 
 
 // --- Initial Load (Try localStorage first, fallback to default HTML) ---
-// forceDefault = true can be used to explicitly load the default HTML structure, bypassing localStorage/Drive.
-function initialLoad(forceDefault = false) {
-    console.log(`Starting initialLoad (forceDefault: ${forceDefault}).`); // Debug log
+// This runs immediately on DOMContentLoaded.
+// It displays data from localStorage if available, giving quick feedback.
+// The automatic load from Google Drive happens *after* sign-in/API ready.
+function initialLoad() {
+    console.log(`Starting initialLoad.`); // Debug log
     let dataLoaded = false;
 
-    if (!forceDefault) {
-        const savedDataString = localStorage.getItem(localStorageKey);
+    const savedDataString = localStorage.getItem(localStorageKey);
 
-        if (savedDataString) {
-             try {
-                const savedData = JSON.parse(savedDataString);
-                // Basic check for valid data structure (object with expected top-level keys)
-                if (savedData && typeof savedData === 'object' && savedData.semesters && savedData.summaries !== undefined) {
-                    console.log("Found data in localStorage. Attempting to apply."); // Debug log
-                    // Call applyPlannerData which handles clearing existing rows and adding loaded ones
-                    applyPlannerData(savedData);
-                    dataLoaded = true;
-                    console.log("Data loaded successfully from localStorage."); // Debug log
-                     showNotification("Loaded data from your browser.", false, true); // Info notification
-                } else {
-                     console.warn("localStorage key found but data was empty, invalid JSON, or missing expected structure.", savedData); // Debug log
-                      // Data is invalid, maybe clear it and proceed to default
-                     localStorage.removeItem(localStorageKey);
-                      showNotification("Error loading data from browser storage. It might be corrupted. Loading default plan.", true);
-                }
-            } catch (error) {
-                console.error("Error parsing data from localStorage:", error); // Debug log
-                 localStorage.removeItem(localStorageKey); // Clear potentially corrupted data
-                 showNotification("Error loading data from browser storage. It might be corrupted. Loading default plan.", true);
-                // Continue below to load default HTML structure
+    if (savedDataString) {
+         try {
+            const savedData = JSON.parse(savedDataString);
+            // Basic check for valid data structure (object with expected top-level keys)
+            if (savedData && typeof savedData === 'object' && savedData.semesters && savedData.summaries !== undefined) {
+                console.log("Found data in localStorage. Attempting to apply."); // Debug log
+                // Call applyPlannerData which handles clearing existing rows and adding loaded ones
+                applyPlannerData(savedData); // This applies the localStorage data
+                dataLoaded = true;
+                console.log("Data loaded successfully from localStorage."); // Debug log
+                 showNotification("Loaded data from your browser.", false, true); // Info notification
+            } else {
+                 console.warn("localStorage key found but data was empty, invalid JSON, or missing expected structure.", savedData); // Debug log
+                  // Data is invalid, maybe clear it and proceed to default HTML path
+                 localStorage.removeItem(localStorageKey);
+                  showNotification("Error loading data from browser storage. It might be corrupted. Loading default plan.", true);
             }
-        } else {
-             console.log("No data found in localStorage."); // Debug log
+        } catch (error) {
+            console.error("Error parsing data from localStorage:", error); // Debug log
+             localStorage.removeItem(localStorageKey); // Clear potentially corrupted data
+             showNotification("Error loading data from browser storage. It might be corrupted. Loading default plan.", true);
+            // Continue below to load default HTML structure
         }
     } else {
-         console.log("Explicitly forcing load of default HTML structure, ignoring localStorage.");
-         // If forcing default, we need to explicitly clear any rows added by a failed previous load attempt
+         console.log("No data found in localStorage."); // Debug log
+    }
+
+
+    if (!dataLoaded) {
+        // If no data was successfully loaded from localStorage,
+        // initialize the UI based on the original HTML structure that remains in the DOM.
+        console.log("Initializing UI with default HTML structure."); // Debug log
+
+         // Explicitly clear any *potential* dynamic rows that might have been left from a previous failed load
          semesterIds.forEach(semId => {
              const table = document.getElementById(`${semId}-table`);
              if(table) {
@@ -2894,22 +2824,17 @@ function initialLoad(forceDefault = false) {
                         // Select ALL rows in tbody except the total row
                        const existingRows = tbody.querySelectorAll('tr:not(.total-credits-row)');
                        existingRows.forEach(row => row.remove());
-                       console.log(`Cleared all non-total rows from ${semId}-table for forceDefault load.`);
+                       // console.log(`Cleared all non-total rows from ${semId}-table for default load.`); // Too verbose
                    }
              }
          });
           const generalNotesArea = document.getElementById('general-notes-area');
-          if(generalNotesArea) generalNotesArea.value = ""; // Clear notes on forced default
+          if(generalNotesArea) generalNotesArea.value = ""; // Clear notes
           // Summary paragraphs automatically retain their default HTML content.
-    }
 
 
-    if (!dataLoaded) {
-        // If no data was successfully loaded from localStorage (or forceDefault was true),
-        // initialize the UI based on the original HTML structure that remains in the DOM.
-        console.log("Initializing UI with default HTML structure."); // Debug log
          // The HTML structure (tables, rows, selects) is already in the DOM.
-         // We just need to populate the selects and run initial calculations.
+         // We just need to populate the selects and run initial calculations for this default data.
          initializeAllRibaDropdowns(); // Populate dropdowns for default HTML rows
          calculateAllSemestersCredits(); // Calculate credits for default data
          calculateAllSemestersUnusedRiba(); // Calculate unused RIBA for default data
@@ -2917,9 +2842,9 @@ function initialLoad(forceDefault = false) {
           // showNotification("Using default planner template.", false, true); // Optional: Indicate default load
     }
 
-     // Initial status message indicates API is loading (until onApiLoadComplete updates it)
+     // Initial status message indicates API is loading (until checkAndLoadFromDrive updates it)
      setDriveStatus("Loading Google API...");
-     console.log("InitialLoad finished."); // Debug log
+     console.log("initialLoad finished."); // Debug log
 }
 
 
@@ -2931,18 +2856,18 @@ document.addEventListener('DOMContentLoaded', () => {
      setupGlobalEventListeners();
 
      // Load GIS and GAPI client libraries are initiated by script tags in head with async/defer and onload attributes.
-     // The onload attributes call gisLoaded() and gapiLoaded().
-     // We have defined window.gisLoaded and window.gapiLoaded *above* this listener
-     // and *before* the script tags in the HTML head, which makes them globally available
-     // when the async scripts finish loading and fire their onload events.
+     // The onload attributes call window.gisLoaded() and window.gapiLoaded().
+     // These are defined *above* this listener and *before* the script tags in the HTML head,
+     // making them globally available when the async scripts finish loading and fire their onload events.
 
      // Start the initial data load from localStorage immediately.
-     // This happens regardless of Google Sign-in status and happens *before* GAPI might load.
-     initialLoad(); // This initializes the UI with default HTML or loaded data.
+     // This displays any potentially saved data quickly while waiting for Google Drive.
+     initialLoad();
 
-     // The rest of the initialization (setting up Google Drive buttons, finding/creating file)
-     // happens within the callbacks (gisLoaded, gapiLoaded, initializeGapiClient, onApiLoadComplete)
-     // once the Google APIs are ready and the user is signed in.
+     // The rest of the initialization (setting up Google Drive buttons, checking sign-in status,
+     // automatically loading from Drive) happens within the callbacks (gisLoaded, gapiLoaded,
+     // initializeGapiClient, handleGsiCallback) which ultimately lead to checkAndLoadFromDrive
+     // being called once both APIs are ready and user is signed in.
 
      console.log("DOMContentLoaded handler finished."); // Debug log
 });
@@ -2953,7 +2878,7 @@ window.addCourse = addCourse;
 // gisLoaded and gapiLoaded are already made global by defining them with `window.` above the script tags in head
 
 
-/* --- End of Refined JavaScript v11 --- */
+/* --- End of Refined JavaScript v12 --- */
 </script>
 
 </body>
